@@ -2,3 +2,21 @@
 POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
+{
+    "email": "super.admin@cms.com",
+    "password": "superadmin@735"
+}
+
+### STUDENT SIGNUP
+POST http://localhost:5000/api/auth/signup
+Content-Type: application/json
+
+{
+    "name": "Sakshi Zalavadi",
+    "email": "zalavadisakshi@gmail.com",
+    "contactNumber": "9428686817",
+    "password": "sakshi@123",
+    "branchId": 7,
+    "semesterId": 12,
+    "yearId": 22
+}
