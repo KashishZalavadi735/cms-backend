@@ -3,12 +3,8 @@ import { seedEnums } from "./enum-seeder";
 import { seedSuperAdmin } from "./super-admin-seeder";
 
 async function main() {
-    console.log("Seeding started...");
-
     await seedEnums();
-    await seedSuperAdmin();
-
-    console.log("Seeding completed !");    
+    await seedSuperAdmin();  
 }
 
 main()

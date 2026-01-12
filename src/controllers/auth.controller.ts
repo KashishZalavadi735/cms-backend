@@ -1,21 +1,19 @@
 import { Request, Response } from "express";
 import { loginService, signupService } from "../services/auth.service";
+import { errorResponse, successResponse } from "../utils/response";
+import { AUTH_MESSAGES } from "../constants/messages";
 
 // login
 export const loginController = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    const result = await loginService(email, password);
+    const data = await loginService(email, password);
 
-    if (!result.status) {
-      return res.status(400).json(result);
-    }
-
-    return res.json(result);
+    return successResponse(res, AUTH_MESSAGES.LOGIN_SUCCESS, data, 200);
   } catch (error) {
     console.error("Login error:", error);
-    return res.status(500).json({ message: "Server error" });
+    return errorResponse(res, AUTH_MESSAGES.SERVER_ERROR, 500, error);
   }
 };
 
@@ -41,21 +39,16 @@ export const signupController = async (req: Request, res: Response) => {
       !semesterId ||
       !yearId
     ) {
-      return res.status(400).json({
-        status: false,
-        message: "All fields are required",
-      });
+      return errorResponse(res, AUTH_MESSAGES.REQUIRED_FIELDS, 400);
     }
 
-    const result = await signupService(req.body);
+    const student = await signupService(req.body);
 
-    if (!result.status) {
-      return res.status(400).json(result);
-    }
+    // return res.status(201).json(student);
+    return successResponse(res, AUTH_MESSAGES.SIGNUP_SUCCESS, student, 201);
 
-    return res.status(201).json(result);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Student signup error:", error);
-    return res.status(500).json({ message: "Server error" });
+    return errorResponse(res, error.message, 400);
   }
 };

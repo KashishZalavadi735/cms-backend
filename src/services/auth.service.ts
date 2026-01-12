@@ -1,17 +1,21 @@
 import { findUserByEmailRepo, createStudentUserRepo } from "../repository/auth.repository";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { LoginResponse, SignupStudentData } from "../interfaces";
+import { AUTH_MESSAGES } from "../constants/messages";
 
 // login
-export const loginService = async (email:string, password:string) => {
+export const loginService = async (email:string, password:string): Promise<LoginResponse> => {
     const user = await findUserByEmailRepo(email);
 
-    if(!user) return { status: false, message: "Invalid email or password" };
-
+    if(!user) {
+        throw new Error(AUTH_MESSAGES.INVALID_CREDENTIALS);
+    }
+    
     const isPasswordValid = await bcrypt.compare(password, user.password);
-
+    
     if (!isPasswordValid) {
-        return { status: false, message: "Invalid email or password" }
+        throw new Error(AUTH_MESSAGES.INVALID_CREDENTIALS);
     } 
 
     const token = jwt.sign(
@@ -25,8 +29,6 @@ export const loginService = async (email:string, password:string) => {
     );
 
     return {
-        status: true,
-        message: "Login successful!",
         token,
         user: {
             id: user.id,
@@ -38,48 +40,24 @@ export const loginService = async (email:string, password:string) => {
 }
 
 // signup only for student
-const STUDENT_ROLE_ID = 4;
-interface SignupData {
-    name: string;
-    email: string; 
-    contactNumber: string;
-    password: string;
-    branchId: number; 
-    semesterId: number; 
-    yearId: number;
-}
+const STUDENT_ROLE_ID = Number(process.env.STUDENT_ROLE_ID);
 
-export const signupService = async (data: SignupData) => {
+export const signupService = async (data: SignupStudentData) => {
     const {  name, email, contactNumber, password, branchId, semesterId, yearId } = data;
 
     const existingUser = await findUserByEmailRepo(email);
 
     if (existingUser) {
-        return {
-            status: false,
-            message: "Email already registered"
-        }
+        throw new Error(AUTH_MESSAGES.EMAIL_EXISTS);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const createStudent = {
-        name,
-        email,
-        contactNumber,
+ 
+    return await createStudentUserRepo({
+        ...data,
         password: hashedPassword,
         roleId: STUDENT_ROLE_ID,
-        branchId,
-        semesterId,
-        yearId
-    };
+    });
 
-    const student = await createStudentUserRepo(createStudent);
-
-    return {
-        status: true,
-        message: "Student registered successfully!",
-        user: student,
-        role: "Student"
-    };
 }

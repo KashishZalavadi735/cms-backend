@@ -12,11 +12,11 @@ POST http://localhost:5000/api/auth/signup
 Content-Type: application/json
 
 {
-    "name": "Sakshi Zalavadi",
-    "email": "zalavadisakshi@gmail.com",
-    "contactNumber": "9428686817",
-    "password": "sakshi@123",
-    "branchId": 7,
-    "semesterId": 12,
+    "name": "Jini Patel",
+    "email": "jinipatel@gmail.com",
+    "contactNumber": "7852145698",
+    "password": "jini@123",
+    "branchId": 9,
+    "semesterId": 13,
     "yearId": 22
 }

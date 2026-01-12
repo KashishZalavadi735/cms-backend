@@ -1,0 +1,30 @@
+export interface LoginResponse {
+  token: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+  };
+}
+
+export interface SignupStudentData {
+  name: string;
+  email: string;
+  contactNumber: string;
+  password: string;
+  branchId: number;
+  semesterId: number;
+  yearId: number;
+}
+
+export interface createStudentData {
+  name: string;
+  email: string;
+  contactNumber: string;
+  password: string;
+  branchId: number;
+  semesterId: number;
+  yearId: number;
+  roleId: number;
+}

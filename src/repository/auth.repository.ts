@@ -1,4 +1,5 @@
 import prisma from "../config/prisma";
+import { createStudentData } from "../interfaces";
 
 export const findUserByEmailRepo = async (email: string) => {
   return prisma.user.findUnique({
@@ -13,17 +14,7 @@ export const findUserByEmailRepo = async (email: string) => {
 };
 
 // signup only for student
-interface SignupData {
-  name: string;
-  email: string;
-  contactNumber: string;
-  password: string;
-  branchId: number;
-  semesterId: number;
-  yearId: number;
-  roleId: number;
-}
 
-export const createStudentUserRepo = async (data: SignupData) => {
+export const createStudentUserRepo = async (data: createStudentData) => {
   return prisma.user.create({ data });
 };
