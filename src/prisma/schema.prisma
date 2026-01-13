@@ -6,3 +6,45 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model EnumTable {
+  id        Int    @id @default(autoincrement())
+
+  enumType  String @db.VarChar(50)
+  enumValue String @db.VarChar(100)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([enumType, enumValue])
+
+  // Relations
+  userRoles       User[] @relation("UserRole")
+  userBranches    User[] @relation("UserBranch")
+  userSemesters   User[] @relation("UserSemester")
+  userYears       User[] @relation("UserYear")
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  name          String    @default("")
+  email         String    @unique
+  contactNumber String
+  password      String
+
+  roleId        Int
+  branchId      Int
+  semesterId    Int
+  yearId        Int        
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+
+  //Relation
+  role          EnumTable      @relation("UserRole", fields: [roleId], references: [id])    
+  branch        EnumTable      @relation("UserBranch", fields: [branchId], references: [id])    
+  semester      EnumTable      @relation("UserSemester", fields: [semesterId], references: [id])    
+  year          EnumTable      @relation("UserYear", fields: [yearId], references: [id])    
+}
