@@ -28,3 +28,13 @@ export interface createStudentData {
   yearId: number;
   roleId: number;
 }
+
+// Admin interfaces
+
+export interface CreateAdminInput {
+  name: string;
+  email: string;
+  contactNumber: string;
+  branchValue: string;
+  statusId: number;
+}

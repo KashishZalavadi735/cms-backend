@@ -20,3 +20,35 @@ Content-Type: application/json
     "semesterId": 13,
     "yearId": 22
 }
+
+### CREATE ADMIN
+POST http://localhost:5000/api/super-admin/admin
+Content-Type: application/json
+
+{
+    "name": "Kashish Zalavadi",
+    "email": "kashishzalavadi@gmail.com",
+    "contactNumber": "9428187521",
+    "branchValue": "Chemical Engineering"
+}
+
+### GET ALL ADMIN
+GET http://localhost:5000/api/super-admin/admin
+Content-Type: application/json
+
+### GET ADMIN BY ID
+GET http://localhost:5000/api/super-admin/admin/5
+Content-Type: application/json
+
+### UPDATE ADMIN
+PUT http://localhost:5000/api/super-admin/admin/4
+Content-Type: application/json
+
+{
+    "name": "Sumit Zala",
+    "email": "sumitzala@gmail.com",
+    "contactNumber": "942817522"
+}
+
+### DELETE ADMIN
+DELETE http://localhost:5000/api/super-admin/admin/4

@@ -24,27 +24,35 @@ model EnumTable {
   userBranches    User[] @relation("UserBranch")
   userSemesters   User[] @relation("UserSemester")
   userYears       User[] @relation("UserYear")
+  userStatuses    User[] @relation("UserStatus")
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  name          String    @default("")
-  email         String    @unique
+  id            Int           @id @default(autoincrement())
+  name          String        @default("")
+  email         String        @unique
   contactNumber String
   password      String
 
+  code          String?       @unique
+
+  isFirstLogin  Boolean       @default(true)
+  
   roleId        Int
   branchId      Int
-  semesterId    Int
-  yearId        Int        
+  semesterId    Int?
+  yearId        Int?       
+  statusId      Int 
 
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   deletedAt     DateTime?
 
   //Relation
-  role          EnumTable      @relation("UserRole", fields: [roleId], references: [id])    
-  branch        EnumTable      @relation("UserBranch", fields: [branchId], references: [id])    
-  semester      EnumTable      @relation("UserSemester", fields: [semesterId], references: [id])    
-  year          EnumTable      @relation("UserYear", fields: [yearId], references: [id])    
+  role          EnumTable     @relation("UserRole", fields: [roleId], references: [id])    
+  branch        EnumTable     @relation("UserBranch", fields: [branchId], references: [id])    
+  semester      EnumTable?    @relation("UserSemester", fields: [semesterId], references: [id])    
+  year          EnumTable?    @relation("UserYear", fields: [yearId], references: [id])    
+  status        EnumTable     @relation("UserStatus", fields: [statusId], references: [id])
+
 }
