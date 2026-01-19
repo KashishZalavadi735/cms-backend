@@ -84,3 +84,7 @@ Content-Type: application/json
 ### DELETE PROFESSOR
 DELETE http://localhost:5000/api/admin/professor/7
 Content-Type: application/json
+
+### VIEW STUDENTS (PROFESSOR)
+GET http://localhost:5000/api/professor/students
+Content-Type: application/json

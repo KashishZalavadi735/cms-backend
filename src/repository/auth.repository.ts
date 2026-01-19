@@ -2,7 +2,7 @@ import prisma from "../config/prisma";
 import { createStudentData } from "../interfaces";
 
 export const findUserByEmailRepo = async (email: string) => {
-  return prisma.user.findUnique({
+  return prisma.user.findFirst({
     where: {
       email,
       deletedAt: null,

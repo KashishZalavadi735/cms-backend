@@ -11,6 +11,7 @@ interface AuthRequest extends Request {
         name: string;
         email: string;
         roleId: number;
+        branchId: number;
     };
 } 
 export const verifyProfessor = async (req: AuthRequest, res: Response, next: NextFunction) => {

@@ -44,3 +44,9 @@ export const PROFESSOR_MESSAGES = {
   ADMIN_CREATE_PROFESSOR: "Admin can only create professors of their own branch",
   BRANCH_UPDATE: "Branch cannot be updated",
 };
+
+export const STUDENT_MESSAGES = {
+  STUDENTS: "Students fetched successfully",
+  SERVER_ERROR: "Internal server error",
+  BRANCHID_MISSING: "Branch ID missing for professor"
+};
