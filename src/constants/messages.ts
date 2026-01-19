@@ -50,3 +50,8 @@ export const STUDENT_MESSAGES = {
   SERVER_ERROR: "Internal server error",
   BRANCHID_MISSING: "Branch ID missing for professor"
 };
+
+export const ADMIN_PROFESSOR_MESSAGES = {
+  UNAUTHORIZED: "Unauthorized",
+  ACCESS_DENIED: "Access denied"
+};

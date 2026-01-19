@@ -1,4 +1,4 @@
-import prisma from "../config/prisma"
+import prisma from "../config/prisma";
 import { ASSIGNMENT_STATUS_ENUM, BRANCH_ENUM, ENUM_TYPE, ROLE_ENUM, SEMESTER_ENUM, STATUS_ENUM, YEAR_ENUM } from "../constants/enum.constants";
 import { EnumSeed } from "../interfaces/enum";
 
