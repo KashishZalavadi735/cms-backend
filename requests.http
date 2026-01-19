@@ -52,3 +52,35 @@ Content-Type: application/json
 
 ### DELETE ADMIN
 DELETE http://localhost:5000/api/super-admin/admin/4
+
+### CREATE PROFESSOR
+
+POST http://localhost:5000/api/admin/professor
+Content-Type: application/json
+# Branch value must be same as Admin Branch
+{
+  "name": "Sujal Zala",
+  "email": "sujalzala66@gmail.com",
+  "contactNumber": "9876543210",
+  "branchValue": "Chemical Engineering",
+  "statusId": 25
+}
+
+### GET ALL PROFESSOR
+GET http://localhost:5000/api/admin/professor
+Content-Type: application/json
+
+### GET PROFESSOR BY ID
+GET http://localhost:5000/api/admin/professor/6
+Content-Type: application/json
+
+### UPDATE PROFESSOR
+PUT http://localhost:5000/api/admin/professor/7
+Content-Type: application/json
+{
+  "name": "Kalpesh P. Kumavat"
+}
+
+### DELETE PROFESSOR
+DELETE http://localhost:5000/api/admin/professor/7
+Content-Type: application/json

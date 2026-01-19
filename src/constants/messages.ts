@@ -29,3 +29,18 @@ export const ADMIN_MESSAGES = {
   SERVER_ERROR: "Internal server error",
   EMAIL_EXISTS: "Email already exists",
 };
+
+export const PROFESSOR_MESSAGES = {
+  PROFESSOR_CREATE: "Professor created successfully",
+  PROFESSORS: "All Professors fetched successfully",
+  PROFESSOR: "Professor fetched successfully",
+  PROFESSOR_UPDATE: "Professor updated successfully",
+  PROFESSOR_DELETE: "Professor deleted successfully",
+  PROFESSOR_NOT_FOUND: "Professor not found",
+  FAILED_UPDATE: "Failed to update professor",
+  FAILED_DELETE: "Failed to delete professor",
+  SERVER_ERROR: "Internal server error",
+  EMAIL_EXISTS: "Email already exists",
+  ADMIN_CREATE_PROFESSOR: "Admin can only create professors of their own branch",
+  BRANCH_UPDATE: "Branch cannot be updated",
+};

@@ -38,3 +38,13 @@ export interface CreateAdminInput {
   branchValue: string;
   statusId: number;
 }
+
+// Professor interface
+
+export interface CreateProfessorInput {
+  name: string;
+  email: string;
+  contactNumber: string;
+  branchValue: string;
+  statusId: number;
+}

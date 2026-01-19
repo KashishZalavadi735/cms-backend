@@ -11,6 +11,7 @@ interface AuthRequest extends Request {
         name: string;
         email: string;
         roleId: number;
+        branchId: number;
     };
 } 
 export const verifyAdmin = async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -32,7 +33,14 @@ export const verifyAdmin = async (req: AuthRequest, res: Response, next: NextFun
 
         // Find User
         const user = await prisma.user.findUnique({
-            where: { id: decoded.id }
+            where: { id: decoded.id },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                roleId: true,
+                branchId: true
+            }
         });
 
         if (!user) {
