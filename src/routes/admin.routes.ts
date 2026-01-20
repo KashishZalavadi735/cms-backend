@@ -5,6 +5,7 @@ import {
   getProfessorById,
   updateProfessor,
   deleteProfessor,
+  updateProfessorSubjects
 } from "../controllers/admin.controller";
 import { verifyAdmin } from "../middlewares/verifyAdmin";
 import { defaultActiveStatus } from "../middlewares/defaultActiveStatus";
@@ -25,5 +26,8 @@ router.put("/professor/:id", verifyAdmin, updateProfessor);
 
 // Delete Professor
 router.delete("/professor/:id", verifyAdmin, deleteProfessor);
+
+// Assign subject to existing professor
+router.put("/professor/:id/subjects", verifyAdmin, updateProfessorSubjects);
 
 export default router;

@@ -36,6 +36,7 @@ export const PROFESSOR_MESSAGES = {
   PROFESSOR: "Professor fetched successfully",
   PROFESSOR_UPDATE: "Professor updated successfully",
   PROFESSOR_DELETE: "Professor deleted successfully",
+  PROFESSOR_SUBJECT_UPDATE: "Professor subjects updated successfully",
   PROFESSOR_NOT_FOUND: "Professor not found",
   FAILED_UPDATE: "Failed to update professor",
   FAILED_DELETE: "Failed to delete professor",

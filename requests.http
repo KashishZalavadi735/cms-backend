@@ -85,6 +85,14 @@ Content-Type: application/json
 DELETE http://localhost:5000/api/admin/professor/7
 Content-Type: application/json
 
+### ASSIGN SUBJECT TO PROFESSOR
+PUT http://localhost:5000/api/admin/professor/7/subjects
+Content-Type: application/json
+
+{
+    "subjectIds": [161, 172, 183]
+}
+
 ### VIEW STUDENTS (PROFESSOR)
 GET http://localhost:5000/api/professor/students
 Content-Type: application/json

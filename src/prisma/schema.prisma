@@ -16,7 +16,8 @@ model EnumTable {
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-
+  deletedAt     DateTime?
+  
   @@unique([enumType, enumValue])
 
   // Relations

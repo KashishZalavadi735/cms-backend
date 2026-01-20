@@ -24,14 +24,37 @@ export const createProfessorRepo = async (data: Prisma.UserCreateInput): Promise
     return prisma.user.create({ data });
 };
 
+// Subject validation
+export const findSubjectsByIdsRepo = async (subjectIds:number[], branchId: number) => {
+    return prisma.subject.findMany({
+        where: {
+            id: { in: subjectIds },
+            branchId,
+            deletedAt: null
+        }
+    });
+}
+
+// Attach subject
+export const attachProfessorSubjectRepo = async (professorId: number, subjectIds: number[]) => {
+    return prisma.professorSubject.createMany({
+        data: subjectIds.map(subjectId => ({
+            professorId,
+            subjectId
+        })),
+        skipDuplicates: true
+    });
+}
+
 // Get all Professor
-export const getAllProfessorRepo = async (skip: number, limit: number) => {
+export const getAllProfessorRepo = async (skip: number, limit: number, branchId: number) => {
     const [ professors, totalCount ] = await Promise.all([
         prisma.user.findMany({
             where: {
                 role: {
                     enumValue: "Professor"
-                }
+                },
+                branchId: branchId,
             },
             skip,
             take: limit,
@@ -44,7 +67,8 @@ export const getAllProfessorRepo = async (skip: number, limit: number) => {
             where: {
                 role: {
                     enumValue: "Professor"
-                }
+                },
+                branchId: branchId
             }
         })
     ]);
@@ -85,5 +109,12 @@ export const deleteProfessorRepo = async (id: number) => {
                 }
             }
         }
+    });
+};
+
+// Assign subject to existing professor
+export const deleteProfessorSubjectsRepo = async (professorId: number) => {
+    return prisma.professorSubject.deleteMany({
+        where: { professorId }
     });
 };

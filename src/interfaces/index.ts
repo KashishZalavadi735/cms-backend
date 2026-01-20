@@ -47,4 +47,5 @@ export interface CreateProfessorInput {
   contactNumber: string;
   branchValue: string;
   statusId: number;
+  subjectIds: number[];
 }
