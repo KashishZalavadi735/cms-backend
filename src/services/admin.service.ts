@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { PROFESSOR_MESSAGES } from "../constants/messages";
+import { PROFESSOR_MESSAGES, STUDENT_MESSAGES } from "../constants/messages";
 import { CreateProfessorInput } from "../interfaces";
 import {
   createProfessorRepo,
@@ -12,6 +12,7 @@ import {
   attachProfessorSubjectRepo,
   findSubjectsByIdsRepo,
   deleteProfessorSubjectsRepo,
+  findStudentsByBranch
 } from "../repository/admin.repository";
 import { generateOtp } from "../utils/generateOtp";
 import { generateUserCode } from "../utils/generateUserCode";
@@ -236,4 +237,15 @@ export const updateProfessorSubjectsService = async (
   await attachProfessorSubjectRepo(professorId, subjectIds);
 
   return { professorId, subjectIds };
+};
+
+// View branch students
+export const getBranchStudentsService = async (branchId:number) => {
+    if (!branchId) {
+        throw new Error(STUDENT_MESSAGES.BRANCHID_MISSING);
+    }
+
+    const students = await findStudentsByBranch(branchId);
+
+    return students;
 };

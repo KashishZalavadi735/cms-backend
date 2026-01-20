@@ -93,6 +93,10 @@ Content-Type: application/json
     "subjectIds": [161, 172, 183]
 }
 
+### VIEW STUDENTS (HOD/ADMIN)
+GET http://localhost:5000/api/admin/students
+Content-Type: application/json
+
 ### VIEW STUDENTS (PROFESSOR)
 GET http://localhost:5000/api/professor/students
 Content-Type: application/json
