@@ -28,6 +28,9 @@ export async function seedSuperAdmin() {
     // Hash password
     const hashedPassword: string = await bcrypt.hash(superAdminPassword, 10);
 
+    // Fixed code 
+    const SUPER_ADMIN_CODE = "SA_001";
+
     // Create Super Admin user 
     const createSuperAadmin: User = await prisma.user.create({
         data: {
@@ -38,7 +41,8 @@ export async function seedSuperAdmin() {
             roleId: 1,
             branchId: 5,
             semesterId: 12,
-            yearId: 24
+            yearId: 24,
+            code: SUPER_ADMIN_CODE
         }
     });
 

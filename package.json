@@ -23,6 +23,7 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.0.6",
+    "@types/nodemailer": "^7.0.5",
     "nodemon": "^3.1.11",
     "prisma": "^5.15.0",
     "ts-node": "^10.9.2",
@@ -36,6 +37,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.3"
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^7.0.12"
   }
 }

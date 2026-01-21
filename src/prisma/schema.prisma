@@ -7,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ENUM TABLE (ENUM STORAGE)
 model EnumTable {
   id        Int    @id @default(autoincrement())
 
@@ -15,8 +16,8 @@ model EnumTable {
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-
+  deletedAt     DateTime?
+  
   @@unique([enumType, enumValue])
 
   // Relations
@@ -24,27 +25,135 @@ model EnumTable {
   userBranches    User[] @relation("UserBranch")
   userSemesters   User[] @relation("UserSemester")
   userYears       User[] @relation("UserYear")
+  userStatuses    User[] @relation("UserStatus")
+
+  // Subject enums
+  subjectBranches  Subject[] @relation("SubjectBranch")
+  subjectSemesters Subject[] @relation("SubjectSemester")
+
+  // Assignment enums
+  assignmentBranches  Assignment[] @relation("AssignmentBranch")
+  assignmentSemesters Assignment[] @relation("AssignmentSemester")
+
+  // Assignment status enum
+  assignmentStatuses AssignmentStatus[] @relation("AssignmentStatusEnum")
 }
 
+// USER (SUPER ADMIN / ADMIN / PROFESSOR / STUDENT)
 model User {
-  id            Int       @id @default(autoincrement())
-  name          String    @default("")
-  email         String    @unique
+  id            Int           @id @default(autoincrement())
+  name          String        @default("")
+  email         String        @unique
   contactNumber String
   password      String
 
+  code          String?       @unique
+
+  isFirstLogin  Boolean       @default(true)
+  
   roleId        Int
   branchId      Int
-  semesterId    Int
-  yearId        Int        
+  semesterId    Int?
+  yearId        Int?       
+  statusId      Int 
 
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   deletedAt     DateTime?
 
-  //Relation
-  role          EnumTable      @relation("UserRole", fields: [roleId], references: [id])    
-  branch        EnumTable      @relation("UserBranch", fields: [branchId], references: [id])    
-  semester      EnumTable      @relation("UserSemester", fields: [semesterId], references: [id])    
-  year          EnumTable      @relation("UserYear", fields: [yearId], references: [id])    
+  //Enum Relation
+  role                EnumTable           @relation("UserRole", fields: [roleId], references: [id])    
+  branch              EnumTable           @relation("UserBranch", fields: [branchId], references: [id])    
+  semester            EnumTable?          @relation("UserSemester", fields: [semesterId], references: [id])    
+  year                EnumTable?          @relation("UserYear", fields: [yearId], references: [id])    
+  status              EnumTable           @relation("UserStatus", fields: [statusId], references: [id])
+
+  //Relations
+  professorSubjects   ProfessorSubject[]
+  createdAssignments  Assignment[]        @relation("CreatedAssignments")
+  assignmentStatuses  AssignmentStatus[]
+
+}
+
+// SUBJECT TABLE
+model Subject {
+  id            Int           @id @default(autoincrement())
+  name          String
+  branchId      Int
+  semesterId    Int
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+
+  // Enum relations
+  branch        EnumTable     @relation("SubjectBranch", fields: [branchId], references: [id])
+  semester      EnumTable     @relation("SubjectSemester", fields: [semesterId], references: [id])
+
+  //Relations
+  professors    ProfessorSubject[]
+  assignments   Assignment[]
+
+  @@unique([name, branchId, semesterId], name: "name_branchId_semesterId")
+}
+
+// PROFESSOR - SUBJECT (MANY TO MANY)
+model ProfessorSubject {
+  id            Int           @id @default(autoincrement())
+  professorId   Int
+  subjectId     Int
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  professor     User          @relation(fields: [professorId], references: [id])
+  subject       Subject       @relation(fields: [subjectId], references: [id])
+
+  @@unique([professorId, subjectId])
+}
+
+// ASSIGNMENT (CREATED BY ADMIN / PROFESSOR)
+model Assignment {
+  id            Int           @id @default(autoincrement())
+  title         String
+  description   String
+  dueDate       DateTime
+  attachment    String
+
+  subjectId     Int
+  branchId      Int
+  semesterId    Int
+  createdById   Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  // Enum relations
+  branch   EnumTable @relation("AssignmentBranch", fields: [branchId], references: [id])
+  semester EnumTable @relation("AssignmentSemester", fields: [semesterId], references: [id])
+
+  // Relations
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  createdBy User    @relation("CreatedAssignments", fields: [createdById], references: [id])
+
+  statuses AssignmentStatus[]
+}
+
+// ASSIGNMENT STATUS (STUDENT SIDE)
+model AssignmentStatus {
+  id            Int           @id @default(autoincrement())
+  studentId      Int
+  assignmentId  Int
+  statusId      Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  student    User       @relation(fields: [studentId], references: [id])
+  assignment Assignment @relation(fields: [assignmentId], references: [id])
+  status     EnumTable  @relation("AssignmentStatusEnum", fields: [statusId], references: [id])
+
+  @@unique([studentId, assignmentId])
 }

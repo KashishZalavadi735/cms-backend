@@ -3,7 +3,8 @@ export const ENUM_TYPE = {
     BRANCH: "BRANCH",
     SEMESTER: "SEMESTER",
     YEAR: "YEAR",
-    ASSIGNMENT_STATUS: "ASSIGNMENT_STATUS"
+    ASSIGNMENT_STATUS: "ASSIGNMENT_STATUS",
+    STATUS_ENUM: "STATUS_ENUM"
 } as const;
 
 export const ROLE_ENUM = [
@@ -43,4 +44,9 @@ export const ASSIGNMENT_STATUS_ENUM = [
   "Pending",
   "In Process",
   "Completed",
+] as const;
+
+export const STATUS_ENUM = [
+  "Active",
+  "Inactive",
 ] as const;
