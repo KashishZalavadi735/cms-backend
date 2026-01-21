@@ -100,3 +100,28 @@ Content-Type: application/json
 ### VIEW STUDENTS (PROFESSOR)
 GET http://localhost:5000/api/professor/students
 Content-Type: application/json
+
+### CREATE PROFESSOR (ADMIN / PROFESSOR)
+POST http://localhost:5000/api/assignment
+Content-Type: application/json
+
+{
+    "title": "Assignment – Water Treatment",
+    "description": "Study of water hardness, alkalinity, and purification methods including ion exchange and reverse osmosis. Explain industrial applications with neat diagrams.",
+    "dueDate": "2026-02-01",
+    "subjectId": 161,
+    "semesterId": 10,
+    "attachment": "null"
+}
+
+### GET ASSIGNMENTS (STUDENT)
+GET http://localhost:5000/api/assignment/students
+Content-Type: application/json
+
+### CHANGE ASSIGNMENT STATUS (STUNDENT)
+PUT http://localhost:5000/api/assignment/1/status
+Content-Type: application/json
+
+{
+  "statusId": 20
+}

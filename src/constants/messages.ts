@@ -56,3 +56,10 @@ export const ADMIN_PROFESSOR_MESSAGES = {
   UNAUTHORIZED: "Unauthorized",
   ACCESS_DENIED: "Access denied"
 };
+
+export const ASSIGNMENT_MESSAGES = {
+  ASSIGNMENT_CREATE: "Assignment created successfully",
+  ASSIGNMENT_STATUS_UPDATED: "Assignment status updated successfully",
+  ASSIGNMENTS: "Assignments fetched successfully",
+  SERVER_ERROR: "Internal server error",
+};
