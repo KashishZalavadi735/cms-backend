@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { ADMIN_MESSAGES } from "../constants/messages";
+import { ADMIN_MESSAGES, EMAIL_MESSAGES } from "../constants/messages";
 import { CreateAdminInput } from "../interfaces";
 import { generateOtp } from "../utils/generateOtp";
 import { generateUserCode } from "../utils/generateUserCode";
@@ -12,7 +12,8 @@ import {
   getAllAdminRepo,
   getAdminByIdRepo,
   updateAdminRepo,
-  deleteAdminRepo
+  deleteAdminRepo,
+  findMyProfileRepo
 } from "../repository/superAdmin.repository";
 
 // Create Admin
@@ -22,7 +23,7 @@ export const createAdminService = async (data: CreateAdminInput) => {
   // Check email
   const exists = await findAdminByEmailRepo(email);
   if (exists) {
-    throw new Error(ADMIN_MESSAGES.EMAIL_EXISTS);
+    throw new Error(EMAIL_MESSAGES.EMAIL_EXISTS);
   }
 
   // Admin Role
@@ -87,14 +88,14 @@ export const getAllAdminService = async (page: number, limit: number) => {
     admins: admins,
     totalRecords: totalCount,
     totalPages: Math.ceil(totalCount / limit),
-    currentPage: page
+    currentPage: page,
   };
 };
 
 // Get admin by id
 export const getAdminByIdService = async (id: number) => {
   const admin = await getAdminByIdRepo(id);
-  
+
   if (!admin) {
     throw new Error(ADMIN_MESSAGES.ADMIN_NOT_FOUND);
   }
@@ -112,9 +113,9 @@ export const updateAdminService = async (id: number, data: any) => {
   }
 
   // Prepare updated data
-  const updatedData = {...data};
+  const updatedData = { ...data };
 
-  // Hash password if provided 
+  // Hash password if provided
   if (data.password) {
     updatedData.password = await bcrypt.hash(data.password, 10);
   }
@@ -122,21 +123,31 @@ export const updateAdminService = async (id: number, data: any) => {
   // Update admin in DB
   try {
     const updatedAdmin = await updateAdminRepo(id, updatedData);
-    
+
     return updatedAdmin;
   } catch (error: any) {
     console.error("Error updating admin:", error);
     throw new Error(ADMIN_MESSAGES.FAILED_UPDATE);
   }
-}
+};
 
 // Delete admin
 export const deleteAdminService = async (id: number) => {
-  const admin = await getAdminByIdRepo(id);
+  try {
+    const admin = await getAdminByIdRepo(id);
 
-  if (!admin) {
-    throw new Error(ADMIN_MESSAGES.ADMIN_NOT_FOUND);
+    if (!admin) {
+      throw new Error(ADMIN_MESSAGES.ADMIN_NOT_FOUND);
+    }
+
+    return deleteAdminRepo(id);
+  } catch (error: any) {
+    console.error("Error deleting admin:", error);
+    throw new Error(ADMIN_MESSAGES.FAILED_DELETE);
   }
+};
 
-  return deleteAdminRepo(id);
-}
+// My profile
+export const getMyProfileService = async (userId: number) => {
+  return await findMyProfileRepo(userId);
+};

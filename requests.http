@@ -21,6 +21,8 @@ Content-Type: application/json
     "yearId": 22
 }
 
+### SUPER ADMIN
+
 ### CREATE ADMIN
 POST http://localhost:5000/api/super-admin/admin
 Content-Type: application/json
@@ -53,8 +55,14 @@ Content-Type: application/json
 ### DELETE ADMIN
 DELETE http://localhost:5000/api/super-admin/admin/4
 
-### CREATE PROFESSOR
+### MY PROFILE 
+GET http://localhost:5000/api/super-admin/me
+Content-Type: application/json
 
+
+### ADMIN
+
+### CREATE PROFESSOR
 POST http://localhost:5000/api/admin/professor
 Content-Type: application/json
 # Branch value must be same as Admin Branch
@@ -97,11 +105,32 @@ Content-Type: application/json
 GET http://localhost:5000/api/admin/students
 Content-Type: application/json
 
+### MY PROFILE 
+GET http://localhost:5000/api/admin/me
+Content-Type: application/json
+
+
+### PROFESSOR
+
 ### VIEW STUDENTS (PROFESSOR)
 GET http://localhost:5000/api/professor/students
 Content-Type: application/json
 
-### CREATE PROFESSOR (ADMIN / PROFESSOR)
+### MY PROFILE 
+GET http://localhost:5000/api/professor/me
+Content-Type: application/json
+
+
+### STUDENT
+
+### MY PROFILE 
+GET http://localhost:5000/api/student/me
+Content-Type: application/json
+
+
+### ASSIGNMENT
+
+### CREATE ASSIGNMENT (ADMIN / PROFESSOR)
 POST http://localhost:5000/api/assignment
 Content-Type: application/json
 

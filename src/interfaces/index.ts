@@ -1,3 +1,4 @@
+// Login response
 export interface LoginResponse {
   token: string;
   user: {

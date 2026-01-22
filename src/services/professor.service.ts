@@ -1,5 +1,10 @@
 import { STUDENT_MESSAGES } from "../constants/messages"
-import { findStudentsByBranch } from "../repository/professor.repository";
+import { findMyProfileRepo, findStudentsByBranch } from "../repository/professor.repository";
+
+// My profile
+export const getMyProfileService = async (userId: number) => {
+  return await findMyProfileRepo(userId);
+};
 
 // View branch students
 export const getBranchStudentsService = async (branchId:number) => {

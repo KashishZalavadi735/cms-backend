@@ -18,6 +18,15 @@ export const TOKEN_MESSAGES = {
   ACCESS_DENIED_STUD: "Access denied. Student Only.",
 };
 
+export const SERVER_MESSAGES = {
+  SERVER_ERROR: "Internal server error",
+};
+
+export const EMAIL_MESSAGES = {
+  EMAIL_EXISTS: "Email already exists",
+};
+
+
 export const ADMIN_MESSAGES = {
   ADMIN_CREATE: "Admin created successfully",
   ADMINS: "All Admins fetched successfully",
@@ -26,8 +35,9 @@ export const ADMIN_MESSAGES = {
   ADMIN_DELETE: "Admin deleted successfully",
   ADMIN_NOT_FOUND: "Admin not found",
   FAILED_UPDATE: "Failed to update admin",
-  SERVER_ERROR: "Internal server error",
-  EMAIL_EXISTS: "Email already exists",
+  FAILED_DELETE: "Failed to delete admin",
+  // SERVER_ERROR: "Internal server error",
+  // EMAIL_EXISTS: "Email already exists",
 };
 
 export const PROFESSOR_MESSAGES = {
@@ -62,4 +72,11 @@ export const ASSIGNMENT_MESSAGES = {
   ASSIGNMENT_STATUS_UPDATED: "Assignment status updated successfully",
   ASSIGNMENTS: "Assignments fetched successfully",
   SERVER_ERROR: "Internal server error",
+};
+
+export const PROFILE_MESSAGES = {
+  SUPER_ADMIN: "Super admin profile fetched successfully",
+  ADMIN: "Admin profile fetched successfully",
+  PROFESSOR: "Professor profile fetched successfully",
+  STUDENT: "Student profile fetched successfully"
 };

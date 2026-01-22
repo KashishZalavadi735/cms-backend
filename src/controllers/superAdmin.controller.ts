@@ -4,10 +4,17 @@ import {
   getAllAdminService,
   getAdminByIdService,
   updateAdminService,
-  deleteAdminService
+  deleteAdminService,
+  getMyProfileService
 } from "../services/superAdmin.service";
 import { errorResponse, successResponse } from "../utils/response";
-import { ADMIN_MESSAGES } from "../constants/messages";
+import { ADMIN_MESSAGES, PROFILE_MESSAGES, SERVER_MESSAGES } from "../constants/messages";
+
+interface AuthRequest extends Request {
+  user?: {
+    id: number;
+  } 
+};
 
 // Create Admin
 export const createAdmin = async (req: Request, res: Response) => {
@@ -29,7 +36,7 @@ export const createAdmin = async (req: Request, res: Response) => {
       return errorResponse(res, "Email already exists", 400);
     }
     console.log("Error creating admin:", error);
-    return errorResponse(res, ADMIN_MESSAGES.SERVER_ERROR, 500, error.message);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
 };
 
@@ -44,7 +51,7 @@ export const getAllAdmin = async (req: Request, res: Response) => {
     return successResponse(res, ADMIN_MESSAGES.ADMINS, adminData, 200);
   } catch (error: any) {
     console.log("Error fetching admins:", error);
-    return errorResponse(res, ADMIN_MESSAGES.SERVER_ERROR, 500, error.message);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
 };
 
@@ -57,7 +64,7 @@ export const getAdminById = async (req: Request, res: Response) => {
     return successResponse(res, ADMIN_MESSAGES.ADMIN, admin, 200);
   } catch (error: any) {
     console.log("Error fetching admin:", error);
-    return errorResponse(res, ADMIN_MESSAGES.SERVER_ERROR, 500, error.message);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
 };
 
@@ -71,7 +78,7 @@ export const updateAdmin = async (req: Request, res: Response) => {
     return successResponse(res, ADMIN_MESSAGES.ADMIN_UPDATE, updatedAdmin, 200);
   } catch (error: any) {
     console.log("Error updating admin:", error);
-    return errorResponse(res, ADMIN_MESSAGES.SERVER_ERROR, 500, error.message);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
 };
 
@@ -85,6 +92,18 @@ export const deleteAdmin = async (req: Request, res: Response) => {
     return successResponse(res, ADMIN_MESSAGES.ADMIN_DELETE, deletedAdmin, 200);
   } catch (error: any) {
     console.log("Error deleting admin:", error);
-    return errorResponse(res, ADMIN_MESSAGES.SERVER_ERROR, 500, error.message);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
 };
+
+// My Profile
+export const getMyProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const superAdmin = await getMyProfileService(req.user!.id);
+
+    return successResponse(res, PROFILE_MESSAGES.SUPER_ADMIN, superAdmin, 200);
+  } catch (error: any) {
+    console.log("Error fetching profile:", error);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
+  }
+}

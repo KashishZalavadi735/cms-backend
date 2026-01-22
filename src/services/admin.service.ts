@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { PROFESSOR_MESSAGES, STUDENT_MESSAGES } from "../constants/messages";
+import { EMAIL_MESSAGES, PROFESSOR_MESSAGES, STUDENT_MESSAGES } from "../constants/messages";
 import { CreateProfessorInput } from "../interfaces";
 import {
   createProfessorRepo,
@@ -12,7 +12,8 @@ import {
   attachProfessorSubjectRepo,
   findSubjectsByIdsRepo,
   deleteProfessorSubjectsRepo,
-  findStudentsByBranch
+  findStudentsByBranch,
+  findMyProfileRepo
 } from "../repository/admin.repository";
 import { generateOtp } from "../utils/generateOtp";
 import { generateUserCode } from "../utils/generateUserCode";
@@ -44,7 +45,7 @@ export const createProfessorService = async (
 
   // Existing email
   const exists = await findProfessorByEmailRepo(email);
-  if (exists) throw new Error(PROFESSOR_MESSAGES.EMAIL_EXISTS);
+  if (exists) throw new Error(EMAIL_MESSAGES.EMAIL_EXISTS);
 
   // Professor Role
   const role = await findEnumRepo("ROLE", "PROFESSOR");
@@ -248,4 +249,9 @@ export const getBranchStudentsService = async (branchId:number) => {
     const students = await findStudentsByBranch(branchId);
 
     return students;
+};
+
+// My profile
+export const getMyProfileService = async (userId: number) => {
+  return await findMyProfileRepo(userId);
 };

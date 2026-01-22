@@ -1,5 +1,5 @@
 import express from "express";
-import { createAdmin, getAllAdmin, getAdminById, updateAdmin, deleteAdmin } from "../controllers/superAdmin.controller";
+import { createAdmin, getAllAdmin, getAdminById, updateAdmin, deleteAdmin, getMyProfile } from "../controllers/superAdmin.controller";
 import { defaultActiveStatus } from "../middlewares/defaultActiveStatus";
 import { verifySuperAdmin } from "../middlewares/verifySuperAdmin";
 
@@ -19,5 +19,8 @@ router.put("/admin/:id", verifySuperAdmin, updateAdmin);
 
 // Delete admin
 router.delete("/admin/:id", verifySuperAdmin, deleteAdmin);
+
+// My Profile
+router.get("/me", verifySuperAdmin, getMyProfile);
 
 export default router;

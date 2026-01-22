@@ -6,7 +6,8 @@ import {
   updateProfessor,
   deleteProfessor,
   updateProfessorSubjects,
-  getBranchStudents
+  getBranchStudents,
+  getMyProfile
 } from "../controllers/admin.controller";
 import { verifyAdmin } from "../middlewares/verifyAdmin";
 import { defaultActiveStatus } from "../middlewares/defaultActiveStatus";
@@ -33,5 +34,8 @@ router.put("/professor/:id/subjects", verifyAdmin, updateProfessorSubjects);
 
 // View branch students
 router.get("/students", verifyAdmin, getBranchStudents);
+
+// My Profile
+router.get("/me", verifyAdmin, getMyProfile);
 
 export default router;

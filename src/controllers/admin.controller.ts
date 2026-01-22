@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { PROFESSOR_MESSAGES, STUDENT_MESSAGES } from "../constants/messages";
+import { PROFESSOR_MESSAGES, PROFILE_MESSAGES, SERVER_MESSAGES, STUDENT_MESSAGES } from "../constants/messages";
 import {
   createProfessorService,
   getAllProfessorService,
@@ -7,7 +7,8 @@ import {
   updateProfessorService,
   deleteProfessorService,
   updateProfessorSubjectsService,
-  getBranchStudentsService
+  getBranchStudentsService,
+  getMyProfileService
 } from "../services/admin.service";
 import { errorResponse, successResponse } from "../utils/response";
 
@@ -43,7 +44,7 @@ export const createProfessor = async (req: AuthRequest, res: Response) => {
     console.log("Error creating admin:", error);
     return errorResponse(
       res,
-      PROFESSOR_MESSAGES.SERVER_ERROR,
+      SERVER_MESSAGES.SERVER_ERROR,
       500,
       error.message,
     );
@@ -73,7 +74,7 @@ export const getAllProfessor = async (req: AuthRequest, res: Response) => {
     console.log("Error fetching professors: ", error);
     return errorResponse(
       res,
-      PROFESSOR_MESSAGES.SERVER_ERROR,
+      SERVER_MESSAGES.SERVER_ERROR,
       500,
       error.message,
     );
@@ -92,7 +93,7 @@ export const getProfessorById = async (req: AuthRequest, res: Response) => {
     console.log("Error fetching professor data: ", error);
     return errorResponse(
       res,
-      PROFESSOR_MESSAGES.SERVER_ERROR,
+      SERVER_MESSAGES.SERVER_ERROR,
       500,
       error.message,
     );
@@ -121,7 +122,7 @@ export const updateProfessor = async (req: AuthRequest, res: Response) => {
     console.log("Error fetching professor data: ", error);
     return errorResponse(
       res,
-      PROFESSOR_MESSAGES.SERVER_ERROR,
+      SERVER_MESSAGES.SERVER_ERROR,
       500,
       error.message,
     );
@@ -149,7 +150,7 @@ export const deleteProfessor = async (req: AuthRequest, res: Response) => {
     console.log("Error fetching professor data: ", error);
     return errorResponse(
       res,
-      PROFESSOR_MESSAGES.SERVER_ERROR,
+      SERVER_MESSAGES.SERVER_ERROR,
       500,
       error.message,
     );
@@ -182,7 +183,7 @@ export const updateProfessorSubjects = async (
     console.log("Error updating professor subjects: ", error);
     return errorResponse(
       res,
-      PROFESSOR_MESSAGES.SERVER_ERROR,
+      SERVER_MESSAGES.SERVER_ERROR,
       500,
       error.message,
     );
@@ -201,9 +202,21 @@ export const getBranchStudents = async (req: AuthRequest, res: Response) => {
     console.error("Error fetching students: ", error);
     return errorResponse(
       res,
-      STUDENT_MESSAGES.SERVER_ERROR,
+      SERVER_MESSAGES.SERVER_ERROR,
       500,
       error.message,
     );
   }
 };
+
+// My Profile
+export const getMyProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const superAdmin = await getMyProfileService(req.user!.id);
+
+    return successResponse(res, PROFILE_MESSAGES.ADMIN, superAdmin, 200);
+  } catch (error: any) {
+    console.log("Error fetching profile:", error);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
+  }
+}
