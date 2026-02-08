@@ -154,3 +154,6 @@ Content-Type: application/json
 {
   "statusId": 20
 }
+
+### ENUMS
+GET http://localhost:5000/api/enums/BRANCH

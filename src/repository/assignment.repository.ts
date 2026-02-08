@@ -13,17 +13,51 @@ export const professorSubjectRepo = async (
   return prisma.professorSubject.findFirst({
     where: {
       professorId,
-      subjectId
+      subjectId,
     },
     select: {
-      id: true
-    }
+      id: true,
+    },
   });
 };
 
 export const createAssignmentRepo = async (data: CreateAssignmentRepo) => {
   return prisma.assignment.create({
     data,
+  });
+};
+
+// Assignement Subjects
+
+// Professor → only assigned subjects
+export const getProfessorSubjectsRepo = async (
+  professorId: number,
+  branchId: number,
+  semesterId: number,
+) => {
+  return prisma.subject.findMany({
+    where: {
+      semesterId,
+      branchId,
+      professors: {
+        some: {
+          professorId,
+        },
+      },
+    },
+  });
+};
+
+// Admin → all subjects of branch + semester
+export const getSubjectsByBranchSemesterRepo = async (
+  branchId: number,
+  semesterId: number,
+) => {
+  return prisma.subject.findMany({
+    where: {
+      semesterId,
+      branchId,
+    },
   });
 };
 
@@ -42,6 +76,7 @@ export const getAssignmentsForStudentRepo = async (
     },
     include: {
       subject: true,
+      semester: true,
       createdBy: {
         select: {
           id: true,
@@ -51,12 +86,12 @@ export const getAssignmentsForStudentRepo = async (
       },
       statuses: {
         where: {
-          studentId: filters.studentId
+          studentId: filters.studentId,
         },
         include: {
-          status: true
-        }
-      }
+          status: true,
+        },
+      },
     },
   });
 };

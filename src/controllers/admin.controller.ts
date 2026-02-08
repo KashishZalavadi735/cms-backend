@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
-import { PROFESSOR_MESSAGES, PROFILE_MESSAGES, SERVER_MESSAGES, STUDENT_MESSAGES } from "../constants/messages";
+import {
+  PROFESSOR_MESSAGES,
+  PROFILE_MESSAGES,
+  SERVER_MESSAGES,
+  SUBJECT_MESSAGES,
+} from "../constants/messages";
 import {
   createProfessorService,
   getAllProfessorService,
@@ -7,8 +12,9 @@ import {
   updateProfessorService,
   deleteProfessorService,
   updateProfessorSubjectsService,
-  getBranchStudentsService,
-  getMyProfileService
+  getBranchSubjectsService,
+  getMyProfileService,
+  updateMyProfileService
 } from "../services/admin.service";
 import { errorResponse, successResponse } from "../utils/response";
 
@@ -32,7 +38,6 @@ export const createProfessor = async (req: AuthRequest, res: Response) => {
       PROFESSOR_MESSAGES.PROFESSOR_CREATE,
       {
         professor: result.professor,
-        tempPassword: result.otp,
         code: result.professor.code,
       },
       201,
@@ -42,12 +47,7 @@ export const createProfessor = async (req: AuthRequest, res: Response) => {
       return errorResponse(res, "Email already exists", 400);
     }
     console.log("Error creating admin:", error);
-    return errorResponse(
-      res,
-      SERVER_MESSAGES.SERVER_ERROR,
-      500,
-      error.message,
-    );
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
 };
 
@@ -57,10 +57,12 @@ export const getAllProfessor = async (req: AuthRequest, res: Response) => {
     const admin = req.user!;
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 5;
+    const search = String(req.query.search || "");
 
     const professorData = await getAllProfessorService(
       page,
       limit,
+      search,
       admin.branchId,
     );
 
@@ -72,12 +74,7 @@ export const getAllProfessor = async (req: AuthRequest, res: Response) => {
     );
   } catch (error: any) {
     console.log("Error fetching professors: ", error);
-    return errorResponse(
-      res,
-      SERVER_MESSAGES.SERVER_ERROR,
-      500,
-      error.message,
-    );
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
 };
 
@@ -91,12 +88,7 @@ export const getProfessorById = async (req: AuthRequest, res: Response) => {
     return successResponse(res, PROFESSOR_MESSAGES.PROFESSOR, professor, 200);
   } catch (error: any) {
     console.log("Error fetching professor data: ", error);
-    return errorResponse(
-      res,
-      SERVER_MESSAGES.SERVER_ERROR,
-      500,
-      error.message,
-    );
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
 };
 
@@ -120,12 +112,7 @@ export const updateProfessor = async (req: AuthRequest, res: Response) => {
     );
   } catch (error: any) {
     console.log("Error fetching professor data: ", error);
-    return errorResponse(
-      res,
-      SERVER_MESSAGES.SERVER_ERROR,
-      500,
-      error.message,
-    );
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
 };
 
@@ -148,12 +135,7 @@ export const deleteProfessor = async (req: AuthRequest, res: Response) => {
     );
   } catch (error: any) {
     console.log("Error fetching professor data: ", error);
-    return errorResponse(
-      res,
-      SERVER_MESSAGES.SERVER_ERROR,
-      500,
-      error.message,
-    );
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
 };
 
@@ -181,31 +163,21 @@ export const updateProfessorSubjects = async (
     );
   } catch (error: any) {
     console.log("Error updating professor subjects: ", error);
-    return errorResponse(
-      res,
-      SERVER_MESSAGES.SERVER_ERROR,
-      500,
-      error.message,
-    );
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
 };
 
-// View branch students
-export const getBranchStudents = async (req: AuthRequest, res: Response) => {
+// Subjects
+export const getBranchSubjects = async (req: AuthRequest, res: Response) => {
   try {
-    const professorBranchId = req.user!.branchId;
+    const branchId = req.user!.branchId;
 
-    const studentsData = await getBranchStudentsService(professorBranchId);
+    const subjects = await getBranchSubjectsService(branchId);
 
-    return successResponse(res, STUDENT_MESSAGES.STUDENTS, studentsData, 200);
+    return successResponse(res, SUBJECT_MESSAGES.SUBJECT, subjects, 200);
   } catch (error: any) {
-    console.error("Error fetching students: ", error);
-    return errorResponse(
-      res,
-      SERVER_MESSAGES.SERVER_ERROR,
-      500,
-      error.message,
-    );
+    console.error("Error fetching branch subjects:", error);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500);
   }
 };
 
@@ -219,4 +191,21 @@ export const getMyProfile = async (req: AuthRequest, res: Response) => {
     console.log("Error fetching profile:", error);
     return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
-}
+};
+
+// Update My Profile
+export const updateMyProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const updatedProfile = await updateMyProfileService(req.user!.id, req.body);
+
+    return successResponse(
+      res,
+      PROFILE_MESSAGES.UPDATE,
+      updatedProfile,
+      200,
+    );
+  } catch (error: any) {
+    console.error("Error updating profile:", error);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
+  }
+};

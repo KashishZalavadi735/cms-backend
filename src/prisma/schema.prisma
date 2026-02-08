@@ -41,38 +41,40 @@ model EnumTable {
 
 // USER (SUPER ADMIN / ADMIN / PROFESSOR / STUDENT)
 model User {
-  id            Int           @id @default(autoincrement())
-  name          String        @default("")
-  email         String        @unique
-  contactNumber String
-  password      String
+  id                     Int           @id @default(autoincrement())
+  name                   String        @default("")
+  email                  String        @unique
+  contactNumber          String
+  password               String?
 
-  code          String?       @unique
+  // Set password (link-based)
+  passwordSetupToken     String?
+  passwordSetupExpiresAt DateTime?
 
-  isFirstLogin  Boolean       @default(true)
-  
-  roleId        Int
-  branchId      Int
-  semesterId    Int?
-  yearId        Int?       
-  statusId      Int 
+  code                   String       @unique
 
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  deletedAt     DateTime?
+  roleId                 Int
+  branchId               Int
+  semesterId             Int?
+  yearId                 Int?       
+  statusId               Int 
+
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+  deletedAt              DateTime?
 
   //Enum Relation
-  role                EnumTable           @relation("UserRole", fields: [roleId], references: [id])    
-  branch              EnumTable           @relation("UserBranch", fields: [branchId], references: [id])    
-  semester            EnumTable?          @relation("UserSemester", fields: [semesterId], references: [id])    
-  year                EnumTable?          @relation("UserYear", fields: [yearId], references: [id])    
-  status              EnumTable           @relation("UserStatus", fields: [statusId], references: [id])
+  role                   EnumTable           @relation("UserRole", fields: [roleId], references: [id])    
+  branch                 EnumTable           @relation("UserBranch", fields: [branchId], references: [id])    
+  semester               EnumTable?          @relation("UserSemester", fields: [semesterId], references: [id])    
+  year                   EnumTable?          @relation("UserYear", fields: [yearId], references: [id])    
+  status                 EnumTable           @relation("UserStatus", fields: [statusId], references: [id])
 
   //Relations
-  professorSubjects   ProfessorSubject[]
-  createdAssignments  Assignment[]        @relation("CreatedAssignments")
-  assignmentStatuses  AssignmentStatus[]
-
+  professorSubjects      ProfessorSubject[]
+  createdAssignments     Assignment[]        @relation("CreatedAssignments")
+  assignmentStatuses     AssignmentStatus[]
+  otps                   UserOtp[]
 }
 
 // SUBJECT TABLE
@@ -156,4 +158,20 @@ model AssignmentStatus {
   status     EnumTable  @relation("AssignmentStatusEnum", fields: [statusId], references: [id])
 
   @@unique([studentId, assignmentId])
+}
+
+// OTP
+model UserOtp {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  otp       String
+  expiresAt DateTime
+  verified  Boolean   @default(false)
+
+  createdAt DateTime  @default(now())
+
+  // Relations
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }

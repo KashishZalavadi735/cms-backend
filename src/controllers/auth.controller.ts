@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { loginService, signupService } from "../services/auth.service";
 import { errorResponse, successResponse } from "../utils/response";
-import { AUTH_MESSAGES } from "../constants/messages";
+import { AUTH_MESSAGES, SERVER_MESSAGES } from "../constants/messages";
 
-// login
+// Login
 export const loginController = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -11,13 +11,13 @@ export const loginController = async (req: Request, res: Response) => {
     const data = await loginService(email, password);
 
     return successResponse(res, AUTH_MESSAGES.LOGIN_SUCCESS, data, 200);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Login error:", error);
-    return errorResponse(res, AUTH_MESSAGES.SERVER_ERROR, 500, error);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error);
   }
 };
 
-// signup only for student
+// Signup only for student
 export const signupController = async (req: Request, res: Response) => {
   try {
     const {
@@ -44,9 +44,7 @@ export const signupController = async (req: Request, res: Response) => {
 
     const student = await signupService(req.body);
 
-    // return res.status(201).json(student);
     return successResponse(res, AUTH_MESSAGES.SIGNUP_SUCCESS, student, 201);
-
   } catch (error: any) {
     console.error("Student signup error:", error);
     return errorResponse(res, error.message, 400);

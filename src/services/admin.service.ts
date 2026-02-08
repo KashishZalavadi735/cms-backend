@@ -1,5 +1,10 @@
 import bcrypt from "bcryptjs";
-import { EMAIL_MESSAGES, PROFESSOR_MESSAGES, STUDENT_MESSAGES } from "../constants/messages";
+import prisma from "../config/prisma";
+import {
+  EMAIL_MESSAGES,
+  PROFESSOR_MESSAGES,
+  STUDENT_MESSAGES,
+} from "../constants/messages";
 import { CreateProfessorInput } from "../interfaces";
 import {
   createProfessorRepo,
@@ -12,13 +17,14 @@ import {
   attachProfessorSubjectRepo,
   findSubjectsByIdsRepo,
   deleteProfessorSubjectsRepo,
-  findStudentsByBranch,
-  findMyProfileRepo
+  findSubjectsByBranchRepo,
+  findMyProfileRepo,
+  updateMyProfileRepo,
 } from "../repository/admin.repository";
-import { generateOtp } from "../utils/generateOtp";
 import { generateUserCode } from "../utils/generateUserCode";
-import { getEmailTemplate } from "../utils/emailTemplate";
+import { getEmailTemplate } from "../utils/ProfessorEmailTemplate";
 import { sendEmail } from "../utils/sendEmail";
+import { createSetPasswordLink } from "../utils/createSetPasswordLink";
 
 // Create Professor
 export const createProfessorService = async (
@@ -51,19 +57,18 @@ export const createProfessorService = async (
   const role = await findEnumRepo("ROLE", "PROFESSOR");
   if (!role) throw new Error("ROLE.PROFESSOR not configured");
 
+  // Validate & fetch subjects
+  let subjectNames: string[] = [];
+
   if (subjectIds.length > 0) {
     const subjects = await findSubjectsByIdsRepo(subjectIds, branch.id);
+
     if (subjects.length !== subjectIds.length) {
       throw new Error("Invalid subjects for this branch");
     }
-  }
-  // Generate One-Time Password
-  //Plain Password generator
-  const otp = generateOtp(6);
 
-  // Hash Password
-  // Store One-Time Password
-  const hashedPassword = await bcrypt.hash(otp, 10);
+    subjectNames = subjects.map((s) => s.name);
+  }
 
   // Generate code
   const code = await generateUserCode(role.id);
@@ -73,9 +78,8 @@ export const createProfessorService = async (
     name,
     email,
     contactNumber,
-    password: hashedPassword,
+    password: null,
     code,
-    isFirstLogin: true,
     status: {
       connect: { id: statusId },
     },
@@ -87,20 +91,29 @@ export const createProfessorService = async (
     },
   });
 
+  // Attach subjects
   if (subjectIds.length > 0) {
     await attachProfessorSubjectRepo(createdProfessor.id, subjectIds);
   }
 
+  // Set password link
+  const setPasswordLink = await createSetPasswordLink(createdProfessor.id);
+
   // Prepare HTML email
-  const htmlContent = getEmailTemplate(name, email, otp);
+  const htmlContent = getEmailTemplate(
+    name,
+    email,
+    branch.enumValue,
+    subjectNames,
+    setPasswordLink,
+  );
 
   // Send email
-  await sendEmail(email, "Your One-Time Password", htmlContent);
+  await sendEmail(email, "Set Your Password - CMS", htmlContent);
 
   return {
     professor: createdProfessor,
-    otp,
-    message: "Professor created & One-Time Password sent to email",
+    message: "Professor created & Credentials sent to email",
   };
 };
 
@@ -108,6 +121,7 @@ export const createProfessorService = async (
 export const getAllProfessorService = async (
   page: number,
   limit: number,
+  search: string,
   adminBranchId: number,
 ) => {
   const skip = (page - 1) * limit;
@@ -115,6 +129,7 @@ export const getAllProfessorService = async (
   const { professors, totalCount } = await getAllProfessorRepo(
     skip,
     limit,
+    search,
     adminBranchId,
   );
 
@@ -192,7 +207,7 @@ export const deleteProfessorService = async (
   if (!professor) {
     throw new Error(PROFESSOR_MESSAGES.PROFESSOR_NOT_FOUND);
   }
-  
+
   // Branch ownership check
   if (professor.branchId !== adminBranchId) {
     throw new Error("Access denied");
@@ -240,18 +255,76 @@ export const updateProfessorSubjectsService = async (
   return { professorId, subjectIds };
 };
 
-// View branch students
-export const getBranchStudentsService = async (branchId:number) => {
-    if (!branchId) {
-        throw new Error(STUDENT_MESSAGES.BRANCHID_MISSING);
-    }
+// Subjects
+export const getBranchSubjectsService = async (branchId: number) => {
+  if (!branchId) {
+    throw new Error(STUDENT_MESSAGES.BRANCHID_MISSING);
+  }
 
-    const students = await findStudentsByBranch(branchId);
+  const subjects = await findSubjectsByBranchRepo(branchId);
 
-    return students;
+  return subjects;
 };
 
 // My profile
 export const getMyProfileService = async (userId: number) => {
   return await findMyProfileRepo(userId);
+};
+
+// Update My Profile
+export const updateMyProfileService = async (
+  userId: number,
+  data: {
+    name: string;
+    email: string;
+    contactNumber: string;
+    newPassword?: string;
+  },
+) => {
+  const { name, email, contactNumber, newPassword } = data;
+
+  if (!name || !email || !contactNumber) {
+    throw new Error("Name, Email and contact number are required");
+  }
+
+  // Ensure ADMIN role
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      role: { select: { enumValue: true } },
+      password: true,
+    },
+  });
+
+  if (user?.role.enumValue !== "Admin") {
+    throw new Error("Unauthorized access");
+  }
+
+  // Email uniqueness check
+  const emailExists = await prisma.user.findFirst({
+    where: {
+      email,
+      NOT: { id: userId },
+    },
+  });
+
+  if (emailExists) {
+    throw new Error("Email already exists");
+  }
+
+  const updateData: any = {
+    name,
+    email,
+    contactNumber,
+  };
+
+  // Password update (optional)
+  if (newPassword) {
+    if (newPassword.length < 6) {
+      throw new Error("Password must be at least 6 characters");
+    }
+    updateData.password = await bcrypt.hash(newPassword, 10);
+  }
+
+  return await updateMyProfileRepo(userId, updateData);
 };

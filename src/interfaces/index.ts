@@ -9,6 +9,7 @@ export interface LoginResponse {
   };
 }
 
+// Student signup
 export interface SignupStudentData {
   name: string;
   email: string;
@@ -19,6 +20,12 @@ export interface SignupStudentData {
   yearId: number;
 }
 
+export interface CreateStudentData extends SignupStudentData {
+  roleId: number;
+  statusId: number;
+}
+
+// Student data
 export interface createStudentData {
   name: string;
   email: string;
@@ -28,10 +35,11 @@ export interface createStudentData {
   semesterId: number;
   yearId: number;
   roleId: number;
+  statusId: number;
+  code: string;
 }
 
 // Admin interfaces
-
 export interface CreateAdminInput {
   name: string;
   email: string;
@@ -41,7 +49,6 @@ export interface CreateAdminInput {
 }
 
 // Professor interface
-
 export interface CreateProfessorInput {
   name: string;
   email: string;
