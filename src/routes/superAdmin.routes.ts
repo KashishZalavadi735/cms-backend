@@ -1,9 +1,25 @@
 import express from "express";
-import { createAdmin, getAllAdmin, getAdminById, updateAdmin, deleteAdmin } from "../controllers/superAdmin.controller";
+import {
+  createAdmin,
+  getAllAdmin,
+  getAdminById,
+  updateAdmin,
+  deleteAdmin,
+  getMyProfile,
+  updateMyProfile,
+  getDashboardStats,
+  getAdminSummary
+} from "../controllers/superAdmin.controller";
 import { defaultActiveStatus } from "../middlewares/defaultActiveStatus";
 import { verifySuperAdmin } from "../middlewares/verifySuperAdmin";
 
 const router = express.Router();
+
+// Dashboard Cards
+router.get("/dashboard-cards", verifySuperAdmin, getDashboardStats);
+
+// Admin summary 
+router.get("/admin/summary", verifySuperAdmin, getAdminSummary);
 
 // Create Admin
 router.post("/admin", verifySuperAdmin, defaultActiveStatus, createAdmin);
@@ -19,5 +35,11 @@ router.put("/admin/:id", verifySuperAdmin, updateAdmin);
 
 // Delete admin
 router.delete("/admin/:id", verifySuperAdmin, deleteAdmin);
+
+// My Profile
+router.get("/me", verifySuperAdmin, getMyProfile);
+
+// Update My Profile
+router.put("/me", verifySuperAdmin, updateMyProfile);
 
 export default router;

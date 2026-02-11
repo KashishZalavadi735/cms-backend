@@ -3,13 +3,14 @@ import {
   loginController,
   signupController,
 } from "../controllers/auth.controller";
+import { defaultActiveStatus } from "../middlewares/defaultActiveStatus";
 
 const router = express.Router();
 
-// login
+// Login
 router.post("/login", loginController);
 
-// signup only for student
-router.post("/signup", signupController);
+// Signup only for student
+router.post("/signup", defaultActiveStatus, signupController);
 
 export default router;

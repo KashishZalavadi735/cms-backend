@@ -1,22 +1,19 @@
 import prisma from "../config/prisma";
 
-// View branch students
-export const findStudentsByBranch = async (branchId:number) => {
-    return prisma.user.findMany({
+// My Profile
+export const findMyProfileRepo = async (userId:number) => {
+    return prisma.user.findUnique({
         where: {
-            branchId,
-            roleId: 4
+            id: userId
         },
         select: {
             id: true,
             name: true,
             email: true,
-            code: true,
             contactNumber: true,
-            branchId: true,
-            semesterId: true,
-            yearId: true,
-            statusId: true
-        }
+            role: true,
+            code: true,
+            branch: true
+        },  
     });
-}
+};
