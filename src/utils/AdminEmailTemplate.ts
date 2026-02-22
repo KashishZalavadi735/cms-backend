@@ -13,13 +13,21 @@ export const getEmailTemplate = (
     "templates",
     "AdminEmail.html",
   );
+
   let template = fs.readFileSync(templatePath, "utf-8");
+
+  const baseUrl = process.env.BACKEND_URL;
+
+  if (!baseUrl) {
+    throw new Error("BASE_URL is not defined in environment variables");
+  }
 
   template = template
     .replace("{{name}}", name)
     .replace("{{email}}", email)
     .replace("{{branch}}", branch)
-    .replace("{{setPasswordLink}}", setPasswordLink);
+    .replace("{{setPasswordLink}}", setPasswordLink)
+    .replace("{{baseUrl}}", baseUrl);
 
   return template;
 };

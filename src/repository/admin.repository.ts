@@ -1,6 +1,7 @@
 import { Prisma, User } from "@prisma/client";
 import prisma from "../config/prisma";
 
+// Find Enum
 export const findEnumRepo = async (enumType: string, enumValue: string) => {
   return prisma.enumTable.findUnique({
     where: {
@@ -10,6 +11,93 @@ export const findEnumRepo = async (enumType: string, enumValue: string) => {
       },
     },
   });
+};
+
+// Dashboard stats
+export const totalStudentsRepo = async (branchId: number) => {
+  return prisma.user.count({
+    where: {
+      role: {
+        enumValue: "Student",
+      },
+      branchId,
+      deletedAt: null,
+    },
+  });
+};
+
+export const professorRepo = async (branchId: number) => {
+  return prisma.user.count({
+    where: {
+      role: {
+        enumValue: "Professor",
+      },
+      branchId,
+      deletedAt: null,
+    },
+  });
+};
+
+export const activeAssignmentsRepo = async (branchId: number) => {
+  return prisma.assignment.count({
+    where: {
+      branchId,
+      deletedAt: null,
+      dueDate: {
+        gte: new Date(),
+      },
+    },
+  });
+};
+
+export const completedAssignmentsRepo = async (branchId: number) => {
+  const completedStatus = await prisma.enumTable.findUnique({
+    where: {
+      enumType_enumValue: {
+        enumType: "ASSIGNMENT_STATUS",
+        enumValue: "Completed",
+      },
+    },
+  });
+
+  if (!completedStatus) return 0;
+
+  return prisma.assignmentStatus.count({
+    where: {
+      statusId: completedStatus.id,
+      assignment: {
+        branchId,
+        deletedAt: null,
+      },
+    },
+  });
+};
+
+export const getAssignmentsDueThisWeekRepo = async (branchId: number) => {
+  const today = new Date();
+  const nextWeek = new Date();
+  nextWeek.setDate(today.getDate() + 7);
+
+  return prisma.assignment.count({
+    where: {
+      deletedAt: null,
+      branchId,
+      dueDate: {
+        gte: today,
+        lte: nextWeek,
+      },
+    },
+  });
+};
+
+export const getDepartmentsRepo = async (branchId: number) => {
+  const department = await prisma.enumTable.findUnique({
+    where: { id: branchId },
+    select: { enumValue: true },
+  });
+
+  return department?.enumValue || "";
+
 };
 
 // Find professor by id
@@ -84,12 +172,12 @@ export const getAllProfessorRepo = async (
       },
       include: {
         branch: true,
-        status: true
-      }
+        status: true,
+      },
     }),
 
     prisma.user.count({
-      where: whereCondition
+      where: whereCondition,
     }),
   ]);
 
@@ -107,12 +195,12 @@ export const getProfessorByIdRepo = async (id: number) => {
         include: {
           subject: {
             include: {
-              semester: true
-            }
-          }
-        }
-      }
-    }
+              semester: true,
+            },
+          },
+        },
+      },
+    },
   });
 };
 
@@ -206,6 +294,98 @@ export const updateMyProfileRepo = async (
       contactNumber: true,
       role: true,
       code: true,
+    },
+  });
+};
+
+// Professor summary repo
+export const getProfessorSummaryRepo = async (branchId: number) => {
+  // Professor role
+  const ProfessorRole = await prisma.enumTable.findUnique({
+    where: {
+      enumType_enumValue: {
+        enumType: "ROLE",
+        enumValue: "Professor",
+      },
+    },
+  });
+
+  if (!ProfessorRole) {
+    return {
+      totalProfessors: 0,
+      branchName: "",
+      totalSubjects: 0,
+      recentProfessors: [],
+    };
+  }
+
+  // Branch name
+  const branch = await prisma.enumTable.findUnique({
+    where: { id: branchId },
+  });
+
+  // Total Professors
+  const totalProfessors = await prisma.user.count({
+    where: {
+      roleId: ProfessorRole.id,
+      branchId,
+      deletedAt: null,
+    },
+  });
+
+  // Total assigned subjects (COUNT MAPPINGS)
+  const totalSubjects = await prisma.professorSubject.count({
+    where: {
+      professor: {
+        branchId,
+        deletedAt: null,
+      },
+    },
+  });
+
+  // Recent Professors
+  const recentProfessors = await prisma.user.findMany({
+    where: {
+      roleId: ProfessorRole.id,
+      branchId,
+      deletedAt: null,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 3,
+    include: {
+      professorSubjects: {
+        include: {
+          subject: true,
+        },
+      },
+    },
+  });
+
+  return {
+    totalProfessors,
+    branchName: branch?.enumValue ?? "",
+    totalSubjects,
+    recentProfessors: recentProfessors.map((prof) => ({
+      id: prof.id,
+      name: prof.name,
+      subjects: prof.professorSubjects?.map((ps) => ps.subject.name) ?? [],
+    })),
+  };
+};
+
+// Find super admin
+export const findSuperAdminRepo = async () => {
+  return prisma.user.findFirst({
+    where: {
+      role: {
+        enumValue: "SuperAdmin",
+      },
+      deletedAt: null,
+    },
+    select: {
+      id: true,
     },
   });
 };

@@ -61,6 +61,8 @@ export interface CreateProfessorInput {
 // User payload interface
 export interface UserPayload {
   id: number;
+  name: string;
+  code: string;
   roleId: number;
   branchId: number;
   semesterId?: number;

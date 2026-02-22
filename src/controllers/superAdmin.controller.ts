@@ -17,6 +17,7 @@ import {
   EMAIL_MESSAGES,
   PROFILE_MESSAGES,
   SERVER_MESSAGES,
+  SUMMARY_MESSAGES,
 } from "../constants/messages";
 
 interface AuthRequest extends Request {
@@ -122,12 +123,7 @@ export const updateMyProfile = async (req: AuthRequest, res: Response) => {
   try {
     const updatedProfile = await updateMyProfileService(req.user!.id, req.body);
 
-    return successResponse(
-      res,
-      PROFILE_MESSAGES.UPDATE,
-      updatedProfile,
-      200,
-    );
+    return successResponse(res, PROFILE_MESSAGES.UPDATE, updatedProfile, 200);
   } catch (error: any) {
     console.error("Error updating profile:", error);
     return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
@@ -151,7 +147,7 @@ export const getAdminSummary = async (req: Request, res: Response) => {
   try {
     const summary = await getAdminSummaryService();
 
-    return successResponse(res, ADMIN_MESSAGES.ADMINS, summary, 200);
+    return successResponse(res, SUMMARY_MESSAGES.ADMIN_SUMMARY, summary, 200);
   } catch (error: any) {
     console.error("Error fetching admin summary:", error);
     return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);

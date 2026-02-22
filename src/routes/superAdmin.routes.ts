@@ -8,7 +8,7 @@ import {
   getMyProfile,
   updateMyProfile,
   getDashboardStats,
-  getAdminSummary
+  getAdminSummary,
 } from "../controllers/superAdmin.controller";
 import { defaultActiveStatus } from "../middlewares/defaultActiveStatus";
 import { verifySuperAdmin } from "../middlewares/verifySuperAdmin";
@@ -18,7 +18,7 @@ const router = express.Router();
 // Dashboard Cards
 router.get("/dashboard-cards", verifySuperAdmin, getDashboardStats);
 
-// Admin summary 
+// Admin summary
 router.get("/admin/summary", verifySuperAdmin, getAdminSummary);
 
 // Create Admin

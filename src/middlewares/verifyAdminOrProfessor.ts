@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import prisma from "../config/prisma";
 import { errorResponse } from "../utils/response";
-import { ADMIN_PROFESSOR_MESSAGES } from "../constants/messages";
+import { TOKEN_MESSAGES, UNAUTHORIZED_MESSAGES } from "../constants/messages";
 import { EnumTable } from "@prisma/client";
 
 interface AuthRequest extends Request {
@@ -18,13 +18,13 @@ interface AuthRequest extends Request {
 export const verifyAdminOrProfessor = async (
   req: AuthRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return errorResponse(res, ADMIN_PROFESSOR_MESSAGES.UNAUTHORIZED, 401);
+      return errorResponse(res, UNAUTHORIZED_MESSAGES.UNAUTHORIZED, 401);
     }
 
     const token = authHeader.split(" ")[1];
@@ -39,14 +39,14 @@ export const verifyAdminOrProfessor = async (
     });
 
     if (!user) {
-      return errorResponse(res, ADMIN_PROFESSOR_MESSAGES.UNAUTHORIZED, 401);
+      return errorResponse(res, UNAUTHORIZED_MESSAGES.UNAUTHORIZED, 401);
     }
 
     if (
       user.role.enumValue !== "Admin" &&
       user.role.enumValue !== "Professor"
     ) {
-      return errorResponse(res, ADMIN_PROFESSOR_MESSAGES.ACCESS_DENIED, 403);
+      return errorResponse(res, TOKEN_MESSAGES.ACCESS_DENIED_ADMIN_PROF, 403);
     }
 
     req.user = {
@@ -59,6 +59,6 @@ export const verifyAdminOrProfessor = async (
 
     next();
   } catch (error) {
-    return errorResponse(res, ADMIN_PROFESSOR_MESSAGES.UNAUTHORIZED, 401);
+    return errorResponse(res, UNAUTHORIZED_MESSAGES.UNAUTHORIZED, 401);
   }
 };

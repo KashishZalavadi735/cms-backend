@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { loginService, signupService } from "../services/auth.service";
 import { errorResponse, successResponse } from "../utils/response";
-import { AUTH_MESSAGES, SERVER_MESSAGES } from "../constants/messages";
+import { AUTH_MESSAGES, FIELDS_MESSAGES, SERVER_MESSAGES } from "../constants/messages";
 
 // Login
 export const loginController = async (req: Request, res: Response) => {
@@ -39,7 +39,7 @@ export const signupController = async (req: Request, res: Response) => {
       !semesterId ||
       !yearId
     ) {
-      return errorResponse(res, AUTH_MESSAGES.REQUIRED_FIELDS, 400);
+      return errorResponse(res, FIELDS_MESSAGES.REQUIRED_FIELDS, 400);
     }
 
     const student = await signupService(req.body);

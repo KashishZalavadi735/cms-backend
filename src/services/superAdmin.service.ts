@@ -3,6 +3,7 @@ import {
   ADMIN_MESSAGES,
   BRANCH_MESSAGE,
   EMAIL_MESSAGES,
+  FIELDS_MESSAGES,
 } from "../constants/messages";
 import { CreateAdminInput } from "../interfaces";
 import { generateUserCode } from "../utils/generateUserCode";
@@ -27,6 +28,8 @@ import {
   getDepartmentsRepo,
 } from "../repository/superAdmin.repository";
 import { createSetPasswordLink } from "../utils/createSetPasswordLink";
+import { notifyUser } from "./notifications.service";
+import { NOTIFICATION_TYPES } from "../constants/notificationTypes";
 
 // Create Admin
 export const createAdminService = async (data: CreateAdminInput) => {
@@ -65,6 +68,14 @@ export const createAdminService = async (data: CreateAdminInput) => {
     branch: {
       connect: { id: branch.id },
     },
+  });
+
+  // Notification for admin
+  await notifyUser({
+    title: "Account Created",
+    message: "Your admin (HOD) account has been created. Please check your email to set your password.",
+    typeEnumValue: NOTIFICATION_TYPES.ACCOUNT,
+    userIds: [createdAdmin.id]
   });
 
   // Generate set-password link
@@ -177,7 +188,7 @@ export const updateMyProfileService = async (
   const { name, contactNumber, newPassword } = data;
 
   if (!name || !contactNumber) {
-    throw new Error("Name and contact number are required");
+    throw new Error(FIELDS_MESSAGES.REQUIRED_FIELDS);
   }
 
   const updateData: any = {

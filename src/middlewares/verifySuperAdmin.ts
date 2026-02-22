@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import prisma from "../config/prisma";
 import jwt from "jsonwebtoken";
 import { errorResponse } from "../utils/response";
-import { TOKEN_MESSAGES } from "../constants/messages";
+import { TOKEN_MESSAGES, USER_MESSAGES } from "../constants/messages";
 
 // Extend express request to include user
 interface AuthRequest extends Request {
@@ -36,7 +36,7 @@ export const verifySuperAdmin = async (req: AuthRequest, res: Response, next: Ne
         });
 
         if (!user) {
-            return errorResponse(res, TOKEN_MESSAGES.USER_NOT_FOUND, 404);
+            return errorResponse(res, USER_MESSAGES.USER_NOT_FOUND, 404);
         }
 
         // Check super admin role

@@ -1,3 +1,4 @@
+import path from "path";
 import { CreateAssignmentInput, UserPayload } from "../interfaces";
 import {
   createAssignmentRepo,
@@ -6,10 +7,25 @@ import {
   getSubjectsByBranchSemesterRepo,
   getAssignmentsForStudentRepo,
   updateAssignmentStatusRepo,
+  findStudentRepo,
+  findAssignmentCreatorRepo,
+  findUserBasicInfoRepo,
+  getAssignmentSummaryRepo,
 } from "../repository/assignment.repository";
-import path from "path";
+import { notifyUser } from "./notifications.service";
+import { NOTIFICATION_TYPES } from "../constants/notificationTypes";
 
 const ROLE_PROFESSOR = 3;
+
+// Assignment summary
+export const getAssignmentSummaryService = async (user: UserPayload) => {
+  const now = new Date();
+
+  const weekEnd = new Date();
+  weekEnd.setDate(now.getDate() + 7);
+
+  return await getAssignmentSummaryRepo(user.id, now, weekEnd);
+};
 
 // Assign Assignment (Admin & Professor)
 export const createAssignmentService = async (
@@ -45,6 +61,18 @@ export const createAssignmentService = async (
     branchId: user.branchId,
     createdById: user.id,
   });
+
+  // Notification for student
+  const students = await findStudentRepo(user.branchId, semesterIdNum);
+
+  if (students.length > 0) {
+    await notifyUser({
+      title: "New Assignment",
+      message: `A new assignment "${title}" has been added.`,
+      typeEnumValue: NOTIFICATION_TYPES.ASSIGNMENT,
+      userIds: students.map((s) => s.id),
+    });
+  }
 
   return createdAssignment;
 };
@@ -104,6 +132,20 @@ export const updateAssignmentStatusService = async (
     studentId: student.id,
     statusId,
   });
+
+  // Notification to assignment creator
+  const assignment = await findAssignmentCreatorRepo(assignmentId);
+
+  if (assignment?.createdById) {
+    const studentInfo = await findUserBasicInfoRepo(student.id);
+
+    await notifyUser({
+      title: "Assignment Status Updated",
+      message: `Student ${studentInfo?.code} updated status for "${assignment.title}".`,
+      typeEnumValue: NOTIFICATION_TYPES.STATUS,
+      userIds: [assignment.createdById],
+    });
+  }
 
   return updatedStatus;
 };

@@ -22,12 +22,12 @@ async function backfill() {
     });
   }
 
-  console.log("✅ Backfill completed");
+  console.log("Backfill completed");
 }
 
 backfill()
   .catch((err) => {
-    console.error("❌ Backfill failed:", err);
+    console.error("Backfill failed:", err);
   })
   .finally(async () => {
     await prisma.$disconnect();

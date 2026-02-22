@@ -1,9 +1,12 @@
 import bcrypt from "bcryptjs";
 import prisma from "../config/prisma";
 import {
+  BRANCH_MESSAGE,
   EMAIL_MESSAGES,
+  FIELDS_MESSAGES,
   PROFESSOR_MESSAGES,
   STUDENT_MESSAGES,
+  UNAUTHORIZED_MESSAGES,
 } from "../constants/messages";
 import { CreateProfessorInput } from "../interfaces";
 import {
@@ -20,11 +23,54 @@ import {
   findSubjectsByBranchRepo,
   findMyProfileRepo,
   updateMyProfileRepo,
+  getProfessorSummaryRepo,
+  findSuperAdminRepo,
+  totalStudentsRepo,
+  professorRepo,
+  activeAssignmentsRepo,
+  completedAssignmentsRepo,
+  getAssignmentsDueThisWeekRepo,
+  getDepartmentsRepo,
 } from "../repository/admin.repository";
 import { generateUserCode } from "../utils/generateUserCode";
 import { getEmailTemplate } from "../utils/ProfessorEmailTemplate";
 import { sendEmail } from "../utils/sendEmail";
 import { createSetPasswordLink } from "../utils/createSetPasswordLink";
+import { notifyUser } from "./notifications.service";
+import { NOTIFICATION_TYPES } from "../constants/notificationTypes";
+
+// Dashboard Stats
+export const getDashboardStatsService = async (branchId: number) => {
+  const totalStudents = await totalStudentsRepo(branchId);
+
+  const activeAssignments = await activeAssignmentsRepo(branchId);
+
+  const professors = await professorRepo(branchId);
+
+  const completedAssignments = await completedAssignmentsRepo(branchId);
+
+  const dueThisWeek = await getAssignmentsDueThisWeekRepo(branchId);
+
+  const department = await getDepartmentsRepo(branchId);
+
+  return {
+    totalStudents,
+    professors,
+    activeAssignments,
+    completedAssignments,
+    dueThisWeek,
+    department,
+
+    // later you can calculate real growth
+    usersGrowth: 12,
+    completedGrowth: 23,
+  };
+};
+
+// Professor summary service
+export const getProfessorSummaryService = async (branchId: number) => {
+  return await getProfessorSummaryRepo(branchId);
+};
 
 // Create Professor
 export const createProfessorService = async (
@@ -42,7 +88,7 @@ export const createProfessorService = async (
 
   // Branch
   const branch = await findEnumRepo("BRANCH", branchValue);
-  if (!branch) throw new Error("Invalid branch");
+  if (!branch) throw new Error(BRANCH_MESSAGE.INVALID);
 
   // Admin cannot create professor of other branch
   if (branch?.id !== adminBranchId) {
@@ -55,7 +101,7 @@ export const createProfessorService = async (
 
   // Professor Role
   const role = await findEnumRepo("ROLE", "PROFESSOR");
-  if (!role) throw new Error("ROLE.PROFESSOR not configured");
+  if (!role) throw new Error(PROFESSOR_MESSAGES.PROFESSOR_ROLE);
 
   // Validate & fetch subjects
   let subjectNames: string[] = [];
@@ -94,6 +140,27 @@ export const createProfessorService = async (
   // Attach subjects
   if (subjectIds.length > 0) {
     await attachProfessorSubjectRepo(createdProfessor.id, subjectIds);
+  }
+
+  // Notification for professor
+  await notifyUser({
+    title: "Account Created",
+    message:
+      "Your professor account has been created. Please check your email to set your password.",
+    typeEnumValue: NOTIFICATION_TYPES.ACCOUNT,
+    userIds: [createdProfessor.id],
+  });
+
+  // Notify Super Admin
+  const superAdmin = await findSuperAdminRepo();
+
+  if (superAdmin) {
+    await notifyUser({
+      title: "Professor Created",
+      message: `A new professor (${name}) has been created in ${branch.enumValue} branch.`,
+      typeEnumValue: NOTIFICATION_TYPES.PROFESSOR,
+      userIds: [superAdmin.id],
+    });
   }
 
   // Set password link
@@ -232,7 +299,7 @@ export const updateProfessorSubjectsService = async (
 ) => {
   // Professor exists
   const professor = await getProfessorByIdRepo(professorId);
-  if (!professor) throw new Error("Professor not found");
+  if (!professor) throw new Error(PROFESSOR_MESSAGES.PROFESSOR_NOT_FOUND);
 
   // same branch check
   if (professor.branchId !== adminBranchId) {
@@ -284,7 +351,7 @@ export const updateMyProfileService = async (
   const { name, email, contactNumber, newPassword } = data;
 
   if (!name || !email || !contactNumber) {
-    throw new Error("Name, Email and contact number are required");
+    throw new Error(FIELDS_MESSAGES.REQUIRED_FIELDS);
   }
 
   // Ensure ADMIN role
@@ -297,7 +364,7 @@ export const updateMyProfileService = async (
   });
 
   if (user?.role.enumValue !== "Admin") {
-    throw new Error("Unauthorized access");
+    throw new Error(UNAUTHORIZED_MESSAGES.UNAUTHORIZED);
   }
 
   // Email uniqueness check
@@ -309,7 +376,7 @@ export const updateMyProfileService = async (
   });
 
   if (emailExists) {
-    throw new Error("Email already exists");
+    throw new Error(EMAIL_MESSAGES.EMAIL_EXISTS);
   }
 
   const updateData: any = {
