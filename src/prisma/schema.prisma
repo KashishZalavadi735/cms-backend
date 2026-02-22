@@ -37,6 +37,10 @@ model EnumTable {
 
   // Assignment status enum
   assignmentStatuses AssignmentStatus[] @relation("AssignmentStatusEnum")
+
+  // Notification enums
+  notificationTypes      Notification[] @relation("NotificationType")
+  notificationReadStatus Notification[] @relation("NotificationReadStatus")
 }
 
 // USER (SUPER ADMIN / ADMIN / PROFESSOR / STUDENT)
@@ -75,6 +79,7 @@ model User {
   createdAssignments     Assignment[]        @relation("CreatedAssignments")
   assignmentStatuses     AssignmentStatus[]
   otps                   UserOtp[]
+  notifications          Notification[]
 }
 
 // SUBJECT TABLE
@@ -174,4 +179,25 @@ model UserOtp {
   user      User      @relation(fields: [userId], references: [id])
 
   @@index([userId])
+}
+
+// NOTIFICATION
+model Notification {
+  id            Int      @id @default(autoincrement())
+
+  userId        Int
+  title         String
+  message       String
+
+  typeId        Int
+  readStatusId  Int
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+  // Relations
+  user          User      @relation(fields: [userId], references: [id])
+  type          EnumTable @relation("NotificationType", fields: [typeId], references: [id])
+  readStatus    EnumTable @relation("NotificationReadStatus", fields: [readStatusId], references: [id])
 }

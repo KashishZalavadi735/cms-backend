@@ -1,33 +1,61 @@
-import { Request, Response } from "express";
-import path from "path";
 import fs from "fs";
+import path from "path";
+import { Request, Response } from "express";
+import { UserPayload } from "../interfaces";
 import { errorResponse, successResponse } from "../utils/response";
-import { ASSIGNMENT_MESSAGES, SUBJECT_MESSAGES } from "../constants/messages";
+import {
+  ASSIGNMENT_MESSAGES,
+  SERVER_MESSAGES,
+  SUBJECT_MESSAGES,
+  SUMMARY_MESSAGES,
+  UNAUTHORIZED_MESSAGES,
+} from "../constants/messages";
 import {
   createAssignmentService,
   getSubjectsForAssignmentService,
   getAssignmentsForStudentService,
   updateAssignmentStatusService,
+  getAssignmentSummaryService,
 } from "../services/assignment.service";
-import { UserPayload } from "../interfaces";
 
 interface AuthRequest extends Request {
   user?: UserPayload;
   file?: Express.Multer.File;
 }
 
+// Assignment summary
+export const getAssignmentSummary = async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user)
+      return errorResponse(res, UNAUTHORIZED_MESSAGES.UNAUTHORIZED, 401);
+
+    const summary = await getAssignmentSummaryService(req.user);
+
+    return successResponse(
+      res,
+      SUMMARY_MESSAGES.ASSIGNMENT_SUMMARY,
+      summary,
+      200,
+    );
+  } catch (error: any) {
+    console.error("Error fetching admin summary:", error);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
+  }
+};
+
 // Assign Assignment (Admin & Professor)
 export const createAssignment = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
-      return errorResponse(res, "Unauthorized", 401);
+      return errorResponse(res, UNAUTHORIZED_MESSAGES.UNAUTHORIZED, 401);
     }
 
-    const attachment = req.file
-      ? `assignments/${req.file.filename}`
-      : null;
+    const attachment = req.file ? `assignments/${req.file.filename}` : null;
 
-    const assignment = await createAssignmentService(req.user!, {...req.body, attachment});
+    const assignment = await createAssignmentService(req.user!, {
+      ...req.body,
+      attachment,
+    });
 
     return successResponse(
       res,
@@ -37,12 +65,7 @@ export const createAssignment = async (req: AuthRequest, res: Response) => {
     );
   } catch (error: any) {
     console.log("Error creating assignment:", error);
-    return errorResponse(
-      res,
-      ASSIGNMENT_MESSAGES.SERVER_ERROR,
-      500,
-      error.message,
-    );
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
 };
 
@@ -53,7 +76,7 @@ export const getSubjectsForAssignment = async (
 ) => {
   const { semesterId } = req.query;
 
-  if (!req.user) return errorResponse(res, "Unauthorized", 401);
+  if (!req.user) return errorResponse(res, UNAUTHORIZED_MESSAGES.UNAUTHORIZED, 401);
 
   const subjects = await getSubjectsForAssignmentService(
     req.user,
@@ -70,7 +93,7 @@ export const getAssignmentsForStudent = async (
 ) => {
   try {
     if (!req.user) {
-      return errorResponse(res, "Unauthorized", 401);
+      return errorResponse(res, UNAUTHORIZED_MESSAGES.UNAUTHORIZED, 401);
     }
 
     const assignments = await getAssignmentsForStudentService(req.user);
@@ -83,12 +106,7 @@ export const getAssignmentsForStudent = async (
     );
   } catch (error: any) {
     console.log("Error fetching assignments:", error);
-    return errorResponse(
-      res,
-      ASSIGNMENT_MESSAGES.SERVER_ERROR,
-      500,
-      error.message,
-    );
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
 };
 
@@ -99,7 +117,7 @@ export const updateAssignmentStatus = async (
 ) => {
   try {
     if (!req.user) {
-      return errorResponse(res, "Unauthorized", 401);
+      return errorResponse(res, UNAUTHORIZED_MESSAGES.UNAUTHORIZED, 401);
     }
 
     const assignmentId = Number(req.params.assignmentId);
@@ -119,12 +137,7 @@ export const updateAssignmentStatus = async (
     );
   } catch (error: any) {
     console.log("Error updating assignment status:", error);
-    return errorResponse(
-      res,
-      ASSIGNMENT_MESSAGES.SERVER_ERROR,
-      500,
-      error.message,
-    );
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
 };
 
@@ -132,7 +145,7 @@ export const updateAssignmentStatus = async (
 export const downloadAssignment = async (req: Request, res: Response) => {
   const fileNameParam = req.params.fileName;
 
-  // ✅ Ensure fileName is string
+  // Ensure fileName is string
   const fileName = Array.isArray(fileNameParam)
     ? fileNameParam[0]
     : fileNameParam;
@@ -141,11 +154,7 @@ export const downloadAssignment = async (req: Request, res: Response) => {
     return errorResponse(res, "Invalid file name", 400);
   }
 
-  const filePath = path.join(
-    __dirname,
-    "../../public/assignments",
-    fileName
-  );
+  const filePath = path.join(__dirname, "../../public/assignments", fileName);
 
   if (!fs.existsSync(filePath)) {
     return errorResponse(res, "File not found", 404);

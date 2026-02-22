@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
 import {
+  DASHBOARD_MESSAGES,
+  EMAIL_MESSAGES,
   PROFESSOR_MESSAGES,
   PROFILE_MESSAGES,
   SERVER_MESSAGES,
   SUBJECT_MESSAGES,
+  SUMMARY_MESSAGES,
 } from "../constants/messages";
 import {
   createProfessorService,
@@ -14,7 +17,9 @@ import {
   updateProfessorSubjectsService,
   getBranchSubjectsService,
   getMyProfileService,
-  updateMyProfileService
+  updateMyProfileService,
+  getProfessorSummaryService,
+  getDashboardStatsService
 } from "../services/admin.service";
 import { errorResponse, successResponse } from "../utils/response";
 
@@ -25,6 +30,34 @@ interface AuthRequest extends Request {
     branchId: number;
   };
 }
+
+// Dashboard Stats
+export const getDashboardStats = async (req: AuthRequest, res: Response) => {
+  try {
+    const branchId = req.user!.branchId;
+
+    const stats = await getDashboardStatsService(branchId);
+
+    return successResponse(res, DASHBOARD_MESSAGES.CARDS, stats, 200);
+  } catch (error: any) {
+    console.log("Dashboard error:", error);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
+  }
+};
+
+// Professor Summary
+export const getProfessorSummary = async (req: AuthRequest, res: Response) => {
+  try {
+    const branchId = req.user!.branchId;
+
+    const summary = await getProfessorSummaryService(branchId);
+
+    return successResponse(res, SUMMARY_MESSAGES.PROFESSOR_SUMMARY, summary, 200);
+  } catch (error: any) {
+    console.error("Error fetching admin summary:", error);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
+  }
+};
 
 // Create Professor
 export const createProfessor = async (req: AuthRequest, res: Response) => {
@@ -44,7 +77,7 @@ export const createProfessor = async (req: AuthRequest, res: Response) => {
     );
   } catch (error: any) {
     if (error.code === "EMAIL_EXISTS") {
-      return errorResponse(res, "Email already exists", 400);
+      return errorResponse(res, EMAIL_MESSAGES.EMAIL_EXISTS, 400);
     }
     console.log("Error creating admin:", error);
     return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);

@@ -9,11 +9,19 @@ import {
   getBranchSubjects,
   getMyProfile,
   updateMyProfile,
+  getProfessorSummary,
+  getDashboardStats,
 } from "../controllers/admin.controller";
 import { verifyAdmin } from "../middlewares/verifyAdmin";
 import { defaultActiveStatus } from "../middlewares/defaultActiveStatus";
 
 const router = express.Router();
+
+// Dashboard Cards
+router.get("/dashboard-cards", verifyAdmin, getDashboardStats);
+
+// Professor summary
+router.get("/professor/summary", verifyAdmin, getProfessorSummary);
 
 // Create Professor
 router.post("/professor", verifyAdmin, defaultActiveStatus, createProfessor);

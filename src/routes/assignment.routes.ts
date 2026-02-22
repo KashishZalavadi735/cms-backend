@@ -4,13 +4,17 @@ import {
   getSubjectsForAssignment,
   getAssignmentsForStudent,
   updateAssignmentStatus,
-  downloadAssignment 
+  downloadAssignment,
+  getAssignmentSummary,
 } from "../controllers/assignment.controller";
 import { verifyAdminOrProfessor } from "../middlewares/verifyAdminOrProfessor";
 import { verifyStudent } from "../middlewares/verifyStudent";
 import { uploadAssignment } from "../middlewares/upload";
 
 const router = express.Router();
+
+// Assignment summary
+router.get("/summary", verifyAdminOrProfessor, getAssignmentSummary);
 
 // Assign Assignment (Admin & Professor)
 router.post(
@@ -31,6 +35,5 @@ router.put("/:assignmentId/status", verifyStudent, updateAssignmentStatus);
 
 // Download attachment
 router.get("/download/:fileName", verifyStudent, downloadAssignment);
-
 
 export default router;

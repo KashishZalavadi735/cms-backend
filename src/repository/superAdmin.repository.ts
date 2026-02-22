@@ -1,5 +1,6 @@
 import { Prisma, User } from "@prisma/client";
 import prisma from "../config/prisma";
+import { BRANCH_MESSAGE } from "../constants/messages";
 
 // Find admin
 export const findAdminByEmailRepo = async (
@@ -98,7 +99,7 @@ export const updateAdminRepo = async (id: number, data: any): Promise<User> => {
       },
     });
 
-    if (!branch) throw new Error("Invalid branch");
+    if (!branch) throw new Error(BRANCH_MESSAGE.INVALID);
     branchConnect = { connect: { id: branch.id } };
   }
 
@@ -282,7 +283,7 @@ export const getAdminSummaryRepo = async () => {
     orderBy: {
       createdAt: "desc",
     },
-    take: 5,
+    take: 3,
     select: {
       id: true,
       name: true,
@@ -310,7 +311,7 @@ export const getDepartmentsRepo = async () => {
   return prisma.enumTable.count({
     where: {
       enumType: "BRANCH",
-      deletedAt: null
-    }
+      deletedAt: null,
+    },
   });
 };

@@ -1,10 +1,12 @@
 export const ENUM_TYPE = {
-    ROLE: "ROLE",
-    BRANCH: "BRANCH",
-    SEMESTER: "SEMESTER",
-    YEAR: "YEAR",
-    ASSIGNMENT_STATUS: "ASSIGNMENT_STATUS",
-    STATUS_ENUM: "STATUS_ENUM"
+  ROLE: "ROLE",
+  BRANCH: "BRANCH",
+  SEMESTER: "SEMESTER",
+  YEAR: "YEAR",
+  ASSIGNMENT_STATUS: "ASSIGNMENT_STATUS",
+  STATUS_ENUM: "STATUS_ENUM",
+  NOTIFICATION_TYPE: "NOTIFICATION_TYPE",
+  NOTIFICATION_READ_STATUS: "NOTIFICATION_READ_STATUS",
 } as const;
 
 export const ROLE_ENUM = [
@@ -46,7 +48,13 @@ export const ASSIGNMENT_STATUS_ENUM = [
   "Completed",
 ] as const;
 
-export const STATUS_ENUM = [
-  "Active",
-  "Inactive",
+export const STATUS_ENUM = ["Active", "Inactive"] as const;
+
+export const NOTIFICATION_TYPE_ENUM = [
+  "ACCOUNT",
+  "ASSIGNMENT",
+  "STATUS",
+  "PROFESSOR",
 ] as const;
+
+export const NOTIFICATION_READ_STATUS_ENUM = ["UNREAD", "READ"] as const;

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { setPasswordService } from "../services/setPassword.service";
 import { errorResponse, successResponse } from "../utils/response";
-import { SERVER_MESSAGES, SET_PASSWORD_MESSAGES } from "../constants/messages";
+import { FIELDS_MESSAGES, SERVER_MESSAGES, SET_PASSWORD_MESSAGES } from "../constants/messages";
 
 // Set password
 export const setPasswordController = async (req: Request, res: Response) => {
@@ -9,7 +9,7 @@ export const setPasswordController = async (req: Request, res: Response) => {
     const { token, password } = req.body;
 
     if (!token || !password) {
-      return errorResponse(res, SET_PASSWORD_MESSAGES.REQUIRED_FIELDS, 400);
+      return errorResponse(res, FIELDS_MESSAGES.REQUIRED_FIELDS, 400);
     }
 
     const data = await setPasswordService(token, password);

@@ -5,6 +5,64 @@ import {
   UpdateAssignmentStatus,
 } from "../interfaces";
 
+// Assignment summary
+export const getAssignmentSummaryRepo = async (
+  createdById: number,
+  now: Date,
+  weekEnd: Date,
+) => {
+  // Recent assignment
+  const recentAssignment = prisma.assignment.findMany({
+    where: {
+      createdById,
+      deletedAt: null,
+    },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+    include: {
+      
+      subject: true,
+      semester: true,
+    },
+  });
+
+  const total = await prisma.assignment.count({
+    where: { createdById, deletedAt: null },
+  });
+
+  const active = await prisma.assignment.count({
+    where: {
+      createdById,
+      deletedAt: null,
+      dueDate: { gte: now },
+    },
+  });
+
+  const dueThisWeek = await prisma.assignment.count({
+    where: {
+      createdById,
+      deletedAt: null,
+      dueDate: {
+        gte: now,
+        lte: weekEnd,
+      },
+    },
+  });
+
+  return {
+    total,
+    active,
+    dueThisWeek,
+    recentAssignment: (await recentAssignment).map((a) => ({
+      id: a.id,
+      title: a.title,
+      subject: a.subject,
+      semester: a.semester,
+      dueDate: a.dueDate,
+    })),
+  };
+};
+
 // Assign Assignment (Admin & Professor)
 export const professorSubjectRepo = async (
   professorId: number,
@@ -116,6 +174,47 @@ export const updateAssignmentStatusRepo = async (
       assignmentId,
       studentId,
       statusId,
+    },
+  });
+};
+
+// Find studnets
+export const findStudentRepo = async (branchId: number, semesterId: number) => {
+  return prisma.user.findMany({
+    where: {
+      role: {
+        enumValue: "STUDENT",
+      },
+      branchId,
+      semesterId,
+    },
+    select: {
+      id: true,
+    },
+  });
+};
+
+// Fetch assignment creator
+export const findAssignmentCreatorRepo = async (assignmentId: number) => {
+  return prisma.assignment.findUnique({
+    where: {
+      id: assignmentId,
+    },
+    select: {
+      createdById: true,
+      title: true,
+    },
+  });
+};
+
+// Find user name
+export const findUserBasicInfoRepo = async (userId: number) => {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      code: true,
     },
   });
 };
