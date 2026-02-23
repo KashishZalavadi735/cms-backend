@@ -24,7 +24,7 @@ app.use("/public", express.static(path.join(__dirname, "../public")));
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://cms-frontend-jxxb.vercel.app",
     credentials: true,
   }),
 );
