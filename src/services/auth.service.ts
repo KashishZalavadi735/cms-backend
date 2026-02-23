@@ -19,6 +19,16 @@ export const loginService = async (
     throw new Error(AUTH_MESSAGES.INVALID_CREDENTIALS);
   }
 
+  // soft-deleted user
+  if (user.deletedAt) {
+    throw new Error("User account is deleted");
+  }
+
+  // inactive user (status based)
+  if (user.status.enumValue !== "Active") {
+    throw new Error("User account is inactive");
+  }
+
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
@@ -49,10 +59,10 @@ export const loginService = async (
 };
 
 // Signup only for student
-const STUDENT_ROLE_ID = Number(process.env.STUDENT_ROLE_ID);
+const STUDENT_ROLE_ID = process.env.STUDENT_ROLE_ID as string;
 
 export const signupService = async (
-  data: SignupStudentData & { statusId: number },
+  data: SignupStudentData & { statusId: string },
 ) => {
   const existingUser = await findUserByEmailRepo(data.email);
 

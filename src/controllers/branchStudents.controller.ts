@@ -5,11 +5,11 @@ import { SERVER_MESSAGES, STUDENT_MESSAGES } from "../constants/messages";
 
 interface AuthRequest extends Request {
   user?: {
-    id: number;
+    id: string;
     name: string;
     email: string;
-    roleId: number;
-    branchId: number;
+    roleId: string;
+    branchId: string;
   };
 }
 
@@ -17,9 +17,9 @@ interface AuthRequest extends Request {
 export const getBranchStudents = async (req: AuthRequest, res: Response) => {
   try {
     const BranchId = req.user!.branchId;
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 5;
-    const search = String(req.query.search || "");
+    const page = Number(Array.isArray(req.query.page) ? req.query.page[0] : req.query.page) || 1;
+    const limit = Number(Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit) || 5;
+    const search = String(Array.isArray(req.query.search) ? req.query.search[0] : req.query.search || "");
 
     const studentsData = await getBranchStudentsService(
       page,

@@ -17,13 +17,13 @@ import {
 } from "../constants/messages";
 
 // My profile
-export const getMyProfileService = async (userId: number) => {
+export const getMyProfileService = async (userId: string) => {
   return await findMyProfileRepo(userId);
 };
 
 // Update My Profile
 export const updateMyProfileService = async (
-  userId: number,
+  userId: string,
   data: {
     name: string;
     email: string;
@@ -80,7 +80,7 @@ export const updateMyProfileService = async (
 };
 
 // Dashboard Stats
-export const getDashboardStatsService = async (branchId: number) => {
+export const getDashboardStatsService = async (branchId: string) => {
   const activeAssignments = await activeAssignmentsRepo(branchId);
 
   const professors = await professorRepo(branchId);

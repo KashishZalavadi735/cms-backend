@@ -3,16 +3,16 @@ import prisma from "../config/prisma";
 export const createNotificationRepo = async (
   title: string,
   message: string,
-  typeId: number,
-  readStatusId: number,
-  userId: number,
+  typeId: string,
+  readStatusId: string,
+  userId: string,
 ) => {
   return prisma.notification.create({
     data: { title, message, typeId, readStatusId, userId },
   });
 };
 
-export const getMyNotificationsRepo = async (userId: number) => {
+export const getMyNotificationsRepo = async (userId: string) => {
   return prisma.notification.findMany({
     where: { userId },
     include: {
@@ -24,8 +24,8 @@ export const getMyNotificationsRepo = async (userId: number) => {
 };
 
 export const getUnreadCountRepo = async (
-  userId: number,
-  unreadStatusId: number,
+  userId: string,
+  unreadStatusId: string,
 ) => {
   return prisma.notification.count({
     where: {
@@ -36,9 +36,9 @@ export const getUnreadCountRepo = async (
 };
 
 export const markAsReadRepo = async (
-  userId: number,
-  notificationId: number,
-  readStatusId: number,
+  userId: string,
+  notificationId: string,
+  readStatusId: string,
 ) => {
   return prisma.notification.updateMany({
     where: {

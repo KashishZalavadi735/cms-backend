@@ -44,7 +44,7 @@ export const verifyOtpService = async (email: string, otp: string) => {
 
 // Change password
 export const changePasswordService = async (
-  userId: number,
+  userId: string,
   newPassword: string,
   confirmPassword: string,
 ) => {

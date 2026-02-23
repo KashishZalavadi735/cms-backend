@@ -31,6 +31,39 @@ import { createSetPasswordLink } from "../utils/createSetPasswordLink";
 import { notifyUser } from "./notifications.service";
 import { NOTIFICATION_TYPES } from "../constants/notificationTypes";
 
+// Dashboard Stats
+export const getDashboardStatsService = async () => {
+  const totalUsers = await totalUsersRepo();
+
+  const professors = await professorSubjectRepo();
+
+  const activeAssignments = await activeAssignmentsRepo();
+
+  const completedAssignments = await completedAssignmentsRepo();
+
+  const dueThisWeek = await getAssignmentsDueThisWeekRepo();
+
+  const departments = await getDepartmentsRepo();
+
+  return {
+    totalUsers,
+    professors,
+    activeAssignments,
+    completedAssignments,
+    dueThisWeek,
+    departments,
+
+    // later you can calculate real growth
+    usersGrowth: 12,
+    completedGrowth: 23,
+  };
+};
+
+// Admin summary service
+export const getAdminSummaryService = async () => {
+  return await getAdminSummaryRepo();
+};
+
 // Create Admin
 export const createAdminService = async (data: CreateAdminInput) => {
   const { name, email, contactNumber, branchValue, statusId } = data;
@@ -42,7 +75,7 @@ export const createAdminService = async (data: CreateAdminInput) => {
   }
 
   // Admin Role
-  const role = await findEnumRepo("ROLE", "ADMIN");
+  const role = await findEnumRepo("ROLE", "Admin");
   if (!role) throw new Error(ADMIN_MESSAGES.ADMIN_ROLE);
 
   // Branch
@@ -79,7 +112,7 @@ export const createAdminService = async (data: CreateAdminInput) => {
   });
 
   // Generate set-password link
-  const setPasswordLink = await createSetPasswordLink(createdAdmin.id);
+  const setPasswordLink = await createSetPasswordLink(String(createdAdmin.id));
 
   // Prepare HTML email
   const htmlContent = getEmailTemplate(
@@ -117,7 +150,7 @@ export const getAllAdminService = async (
 };
 
 // Get admin by id
-export const getAdminByIdService = async (id: number) => {
+export const getAdminByIdService = async (id: string) => {
   const admin = await getAdminByIdRepo(id);
 
   if (!admin) {
@@ -128,7 +161,7 @@ export const getAdminByIdService = async (id: number) => {
 };
 
 // Update admin
-export const updateAdminService = async (id: number, data: any) => {
+export const updateAdminService = async (id: string, data: any) => {
   // Check if user exists
   const existingAdmin = await getAdminByIdRepo(id);
 
@@ -156,7 +189,7 @@ export const updateAdminService = async (id: number, data: any) => {
 };
 
 // Delete admin
-export const deleteAdminService = async (id: number) => {
+export const deleteAdminService = async (id: string) => {
   try {
     const admin = await getAdminByIdRepo(id);
 
@@ -172,13 +205,13 @@ export const deleteAdminService = async (id: number) => {
 };
 
 // My profile
-export const getMyProfileService = async (userId: number) => {
+export const getMyProfileService = async (userId: string) => {
   return await findMyProfileRepo(userId);
 };
 
 // Update My Profile
 export const updateMyProfileService = async (
-  userId: number,
+  userId: string,
   data: {
     name: string;
     contactNumber: string;
@@ -207,35 +240,3 @@ export const updateMyProfileService = async (
   return await updateMyProfileRepo(userId, updateData);
 };
 
-// Dashboard Stats
-export const getDashboardStatsService = async () => {
-  const totalUsers = await totalUsersRepo();
-
-  const professors = await professorSubjectRepo();
-
-  const activeAssignments = await activeAssignmentsRepo();
-
-  const completedAssignments = await completedAssignmentsRepo();
-
-  const dueThisWeek = await getAssignmentsDueThisWeekRepo();
-
-  const departments = await getDepartmentsRepo();
-
-  return {
-    totalUsers,
-    professors,
-    activeAssignments,
-    completedAssignments,
-    dueThisWeek,
-    departments,
-
-    // later you can calculate real growth
-    usersGrowth: 12,
-    completedGrowth: 23,
-  };
-};
-
-// Admin summary service
-export const getAdminSummaryService = async () => {
-  return await getAdminSummaryRepo();
-};

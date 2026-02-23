@@ -9,8 +9,8 @@ import { NOTIFICATION_MESSAGES } from "../constants/messages";
 
 export interface AuthRequest extends Request {
   user?: {
-    id: number;
-    roleId: number;
+    id: string;
+    roleId: string;
   };
 }
 
@@ -52,7 +52,7 @@ export const getUnreadCount = async (req: AuthRequest, res: Response) => {
 export const markAsRead = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.id;
-    const notificationId = Number(req.params.id);
+    const notificationId = String(req.params.id);
     
     const markAsRead = await markAsReadService(userId, notificationId);
     

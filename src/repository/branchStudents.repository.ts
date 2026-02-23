@@ -6,7 +6,7 @@ export const findStudentsByBranch = async (
   skip: number,
   limit: number,
   search: string,
-  branchId: number,
+  branchId: string,
 ) => {
   const whereCondition: Prisma.UserWhereInput = {
     branchId,

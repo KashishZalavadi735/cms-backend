@@ -7,7 +7,7 @@ import {
 
 // Assignment summary
 export const getAssignmentSummaryRepo = async (
-  createdById: number,
+  createdById: string,
   now: Date,
   weekEnd: Date,
 ) => {
@@ -15,25 +15,24 @@ export const getAssignmentSummaryRepo = async (
   const recentAssignment = prisma.assignment.findMany({
     where: {
       createdById,
-      deletedAt: null,
+      deletedAt: { isSet: false },
     },
     orderBy: { createdAt: "desc" },
     take: 3,
     include: {
-      
       subject: true,
       semester: true,
     },
   });
 
   const total = await prisma.assignment.count({
-    where: { createdById, deletedAt: null },
+    where: { createdById, deletedAt: { isSet: false } },
   });
 
   const active = await prisma.assignment.count({
     where: {
       createdById,
-      deletedAt: null,
+      deletedAt: { isSet: false },
       dueDate: { gte: now },
     },
   });
@@ -41,7 +40,7 @@ export const getAssignmentSummaryRepo = async (
   const dueThisWeek = await prisma.assignment.count({
     where: {
       createdById,
-      deletedAt: null,
+      deletedAt: { isSet: false },
       dueDate: {
         gte: now,
         lte: weekEnd,
@@ -65,8 +64,8 @@ export const getAssignmentSummaryRepo = async (
 
 // Assign Assignment (Admin & Professor)
 export const professorSubjectRepo = async (
-  professorId: number,
-  subjectId: number,
+  professorId: string,
+  subjectId: string,
 ) => {
   return prisma.professorSubject.findFirst({
     where: {
@@ -89,9 +88,9 @@ export const createAssignmentRepo = async (data: CreateAssignmentRepo) => {
 
 // Professor → only assigned subjects
 export const getProfessorSubjectsRepo = async (
-  professorId: number,
-  branchId: number,
-  semesterId: number,
+  professorId: string,
+  branchId: string,
+  semesterId: string,
 ) => {
   return prisma.subject.findMany({
     where: {
@@ -108,8 +107,8 @@ export const getProfessorSubjectsRepo = async (
 
 // Admin → all subjects of branch + semester
 export const getSubjectsByBranchSemesterRepo = async (
-  branchId: number,
-  semesterId: number,
+  branchId: string,
+  semesterId: string,
 ) => {
   return prisma.subject.findMany({
     where: {
@@ -121,13 +120,13 @@ export const getSubjectsByBranchSemesterRepo = async (
 
 // View assignments (students)
 export const getAssignmentsForStudentRepo = async (
-  filters: StudentAssignmentFilter & { studentId: number },
+  filters: StudentAssignmentFilter & { studentId: string },
 ) => {
   return prisma.assignment.findMany({
     where: {
       branchId: filters.branchId,
       semesterId: filters.semesterId,
-      deletedAt: null,
+      deletedAt: { isSet: false },
     },
     orderBy: {
       createdAt: "desc",
@@ -179,7 +178,7 @@ export const updateAssignmentStatusRepo = async (
 };
 
 // Find studnets
-export const findStudentRepo = async (branchId: number, semesterId: number) => {
+export const findStudentRepo = async (branchId: string, semesterId: string) => {
   return prisma.user.findMany({
     where: {
       role: {
@@ -195,7 +194,7 @@ export const findStudentRepo = async (branchId: number, semesterId: number) => {
 };
 
 // Fetch assignment creator
-export const findAssignmentCreatorRepo = async (assignmentId: number) => {
+export const findAssignmentCreatorRepo = async (assignmentId: string) => {
   return prisma.assignment.findUnique({
     where: {
       id: assignmentId,
@@ -208,7 +207,7 @@ export const findAssignmentCreatorRepo = async (assignmentId: number) => {
 };
 
 // Find user name
-export const findUserBasicInfoRepo = async (userId: number) => {
+export const findUserBasicInfoRepo = async (userId: string) => {
   return prisma.user.findUnique({
     where: { id: userId },
     select: {

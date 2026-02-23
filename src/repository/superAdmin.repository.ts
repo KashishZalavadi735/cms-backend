@@ -72,7 +72,7 @@ export const getAllAdminRepo = async (
 };
 
 // Get admin by id
-export const getAdminByIdRepo = async (id: number) => {
+export const getAdminByIdRepo = async (id: string) => {
   return prisma.user.findUnique({
     where: { id },
     include: {
@@ -83,7 +83,7 @@ export const getAdminByIdRepo = async (id: number) => {
 };
 
 // Update admin
-export const updateAdminRepo = async (id: number, data: any): Promise<User> => {
+export const updateAdminRepo = async (id: string, data: any): Promise<User> => {
   // Destructure only what you need
   const { branchValue, statusId, password, ...rest } = data;
 
@@ -122,14 +122,17 @@ export const updateAdminRepo = async (id: number, data: any): Promise<User> => {
 
 // Delete admin
 // Soft delete
-export const deleteAdminRepo = async (id: number) => {
+export const deleteAdminRepo = async (id: string) => {
   return prisma.user.update({
     where: { id: id },
     data: {
       deletedAt: new Date(),
       status: {
         connect: {
-          id: 26,
+          enumType_enumValue: {
+            enumType: "STATUS",
+            enumValue: "Inactive",
+          },
         },
       },
     },
@@ -137,7 +140,7 @@ export const deleteAdminRepo = async (id: number) => {
 };
 
 // My Profile
-export const findMyProfileRepo = async (userId: number) => {
+export const findMyProfileRepo = async (userId: string) => {
   return prisma.user.findUnique({
     where: {
       id: userId,
@@ -155,7 +158,7 @@ export const findMyProfileRepo = async (userId: number) => {
 
 // Update My Profile
 export const updateMyProfileRepo = async (
-  userId: number,
+  userId: string,
   data: {
     name: string;
     contactNumber: string;
@@ -179,7 +182,7 @@ export const updateMyProfileRepo = async (
 // Dashboard Stats
 export const totalUsersRepo = async () => {
   return prisma.user.count({
-    where: { deletedAt: null },
+    where: { deletedAt: { isSet: false } },
   });
 };
 
@@ -194,7 +197,7 @@ export const professorSubjectRepo = async () => {
 export const activeAssignmentsRepo = async () => {
   return prisma.assignment.count({
     where: {
-      deletedAt: null,
+      deletedAt: { isSet: false },
       dueDate: {
         gte: new Date(),
       },
@@ -217,7 +220,7 @@ export const completedAssignmentsRepo = async () => {
   return prisma.assignmentStatus.count({
     where: {
       statusId: completedStatus.id,
-      deletedAt: null,
+      deletedAt: { isSet: false },
     },
   });
 };
@@ -229,7 +232,7 @@ export const getAssignmentsDueThisWeekRepo = async () => {
 
   return prisma.assignment.count({
     where: {
-      deletedAt: null,
+      deletedAt: { isSet: false },
       dueDate: {
         gte: today,
         lte: nextWeek,
@@ -262,7 +265,7 @@ export const getAdminSummaryRepo = async () => {
   const totalAdmins = await prisma.user.count({
     where: {
       roleId: adminRole.id,
-      deletedAt: null,
+      deletedAt: { isSet: false },
     },
   });
 
@@ -270,7 +273,7 @@ export const getAdminSummaryRepo = async () => {
   const totalDepartments = await prisma.enumTable.count({
     where: {
       enumType: "BRANCH",
-      deletedAt: null,
+      deletedAt: { isSet: false },
     },
   });
 
@@ -278,7 +281,7 @@ export const getAdminSummaryRepo = async () => {
   const recentAdmins = await prisma.user.findMany({
     where: {
       roleId: adminRole.id,
-      deletedAt: null,
+      deletedAt: { isSet: false },
     },
     orderBy: {
       createdAt: "desc",
@@ -311,7 +314,7 @@ export const getDepartmentsRepo = async () => {
   return prisma.enumTable.count({
     where: {
       enumType: "BRANCH",
-      deletedAt: null,
+      deletedAt: { isSet: false },
     },
   });
 };

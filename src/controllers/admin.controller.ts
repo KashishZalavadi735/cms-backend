@@ -25,9 +25,9 @@ import { errorResponse, successResponse } from "../utils/response";
 
 interface AuthRequest extends Request {
   user?: {
-    id: number;
-    roleId: number;
-    branchId: number;
+    id: string;
+    roleId: string;
+    branchId: string;
   };
 }
 
@@ -88,9 +88,9 @@ export const createProfessor = async (req: AuthRequest, res: Response) => {
 export const getAllProfessor = async (req: AuthRequest, res: Response) => {
   try {
     const admin = req.user!;
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 5;
-    const search = String(req.query.search || "");
+    const page = Number(Array.isArray(req.query.page) ? req.query.page[0] : req.query.page) || 1;
+    const limit = Number(Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit) || 5;
+    const search = String(Array.isArray(req.query.search) ? req.query.search[0] : req.query.search || "");
 
     const professorData = await getAllProfessorService(
       page,
@@ -112,11 +112,11 @@ export const getAllProfessor = async (req: AuthRequest, res: Response) => {
 };
 
 // Get Professor by id
-export const getProfessorById = async (req: AuthRequest, res: Response) => {
+export const  getProfessorById = async (req: AuthRequest, res: Response) => {
   try {
     const admin = req.user!;
     const { id } = req.params;
-    const professor = await getProfessorByIdService(Number(id), admin.branchId);
+    const professor = await getProfessorByIdService(String(id), admin.branchId);
 
     return successResponse(res, PROFESSOR_MESSAGES.PROFESSOR, professor, 200);
   } catch (error: any) {
@@ -132,7 +132,7 @@ export const updateProfessor = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
     const updatedProfessor = await updateProfessorService(
-      Number(id),
+      String(id),
       req.body,
       admin.branchId,
     );
@@ -156,7 +156,7 @@ export const deleteProfessor = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
     const deletedProfessor = await deleteProfessorService(
-      Number(id),
+      String(id),
       admin.branchId,
     );
 
@@ -178,7 +178,7 @@ export const updateProfessorSubjects = async (
   res: Response,
 ) => {
   try {
-    const professorId = Number(req.params.id);
+    const professorId = String(req.params.id);
     const { subjectIds } = req.body;
     const admin = req.user!;
 

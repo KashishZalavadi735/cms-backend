@@ -63,10 +63,14 @@ export async function seedEnums() {
     })),
   ];
 
-  await prisma.enumTable.createMany({
-    data: enums,
-    skipDuplicates: true,
-  });
+  for (const e of enums) {
+    try {
+      await prisma.enumTable.createMany({ data: e });
+    } catch (err: any) {
+      if (err.code === "P2002") continue; // Duplicate, skip
+      throw err;
+    }
+  }
 
   console.log("All enums inserted!");
 }

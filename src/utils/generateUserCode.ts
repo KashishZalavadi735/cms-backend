@@ -2,7 +2,7 @@ import prisma from "../config/prisma";
 import { ROLE_PREFIX } from "../constants/rolePrefix";
 
 export const generateUserCode = async (
-  roleId: number
+  roleId: string
 ): Promise<string> => {
   const role = await prisma.enumTable.findUnique({
     where: { id: roleId },

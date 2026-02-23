@@ -76,11 +76,12 @@ export const getSubjectsForAssignment = async (
 ) => {
   const { semesterId } = req.query;
 
-  if (!req.user) return errorResponse(res, UNAUTHORIZED_MESSAGES.UNAUTHORIZED, 401);
+  if (!req.user)
+    return errorResponse(res, UNAUTHORIZED_MESSAGES.UNAUTHORIZED, 401);
 
   const subjects = await getSubjectsForAssignmentService(
     req.user,
-    Number(semesterId),
+    String(semesterId),
   );
 
   return successResponse(res, SUBJECT_MESSAGES.SUBJECT, subjects, 200);
@@ -120,14 +121,20 @@ export const updateAssignmentStatus = async (
       return errorResponse(res, UNAUTHORIZED_MESSAGES.UNAUTHORIZED, 401);
     }
 
-    const assignmentId = Number(req.params.assignmentId);
+    // Normalize assignmentId to string
+    const assignmentIdParam = req.params.assignmentId;
+    const assignmentId = Array.isArray(assignmentIdParam)
+      ? assignmentIdParam[0]
+      : assignmentIdParam;
+
     const { statusId } = req.body;
 
     const result = await updateAssignmentStatusService(
-      req.user!,
+      req.user,
       assignmentId,
       statusId,
     );
+
 
     return successResponse(
       res,
@@ -143,22 +150,22 @@ export const updateAssignmentStatus = async (
 
 // Download attachment
 export const downloadAssignment = async (req: Request, res: Response) => {
-  const fileNameParam = req.params.fileName;
+  try {
+    const fileNameParam = req.params.fileName;
+    const fileName = Array.isArray(fileNameParam)
+      ? fileNameParam[0]
+      : fileNameParam;
 
-  // Ensure fileName is string
-  const fileName = Array.isArray(fileNameParam)
-    ? fileNameParam[0]
-    : fileNameParam;
+    if (!fileName) return errorResponse(res, "Invalid file name", 400);
 
-  if (!fileName) {
-    return errorResponse(res, "Invalid file name", 400);
+    const filePath = path.join(__dirname, "../../public/assignments", fileName);
+
+    if (!fs.existsSync(filePath))
+      return errorResponse(res, "File not found", 404);
+
+    return res.download(filePath);
+  } catch (error: any) {
+    console.error("Error downloading file:", error);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
   }
-
-  const filePath = path.join(__dirname, "../../public/assignments", fileName);
-
-  if (!fs.existsSync(filePath)) {
-    return errorResponse(res, "File not found", 404);
-  }
-
-  res.download(filePath);
 };

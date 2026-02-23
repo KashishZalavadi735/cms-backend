@@ -4,14 +4,14 @@ import { errorResponse } from "../utils/response";
 import { UNAUTHORIZED_MESSAGES } from "../constants/messages";
 
 interface TokenPayload extends JwtPayload {
-  id: number;
-  roleId: number;
+  id: string;
+  roleId: string;
 }
 
 export interface AuthRequest extends Request {
   user?: {
-    id: number;
-    roleId: number;
+    id: string;
+    roleId: string;
   };
 }
 

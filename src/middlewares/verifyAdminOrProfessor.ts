@@ -7,10 +7,10 @@ import { EnumTable } from "@prisma/client";
 
 interface AuthRequest extends Request {
   user?: {
-    id: number;
-    roleId: number;
-    branchId: number;
-    semesterId?: number;
+    id: string;
+    roleId: string;
+    branchId: string;
+    semesterId?: string;
     role: EnumTable;
   };
 }
