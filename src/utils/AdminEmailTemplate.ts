@@ -27,7 +27,6 @@ export const getEmailTemplate = (
     .replace("{{email}}", email)
     .replace("{{branch}}", branch)
     .replace("{{setPasswordLink}}", setPasswordLink)
-    .replace("{{baseUrl}}", baseUrl);
 
   return template;
 };

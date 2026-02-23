@@ -3,14 +3,14 @@ import { createStudentData } from "../interfaces";
 
 // Find user
 export const findUserByEmailRepo = async (email: string) => {
-  return prisma.user.findFirst({
+  return prisma.user.findUnique({
     where: {
-      email,
-      deletedAt: null,
+      email
     },
     include: {
       role: true,
       branch: true,
+      status: true
     },
   });
 };

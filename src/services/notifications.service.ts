@@ -15,7 +15,7 @@ export const notifyUser = async ({
   title: string;
   message: string;
   typeEnumValue: string;
-  userIds: number[];
+  userIds: string[];
 }) => {
   if (!userIds.length) return;
 
@@ -57,11 +57,11 @@ export const notifyUser = async ({
   );
 };
 
-export const getMyNotificationsService = async (userId: number) => {
+export const getMyNotificationsService = async (userId: string) => {
   return getMyNotificationsRepo(userId);
 };
 
-export const getUnreadCountService = async (userId: number) => {
+export const getUnreadCountService = async (userId: string) => {
   const unreadEnum = await prisma.enumTable.findUnique({
     where: {
       enumType_enumValue: {
@@ -77,8 +77,8 @@ export const getUnreadCountService = async (userId: number) => {
 };
 
 export const markAsReadService = async (
-  userId: number,
-  notificationId: number,
+  userId: string,
+  notificationId: string,
 ) => {
   const readEnum = await prisma.enumTable.findUnique({
     where: {

@@ -14,7 +14,7 @@ export const findUserByPasswordTokenRepo = async (hashedToken: string) => {
 
 // Update user password
 export const updateUserPasswordRepo = async (
-  userId: number,
+  userId: string,
   hashedPassword: string,
 ) => {
   return prisma.user.update({

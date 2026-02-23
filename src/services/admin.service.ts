@@ -40,7 +40,7 @@ import { notifyUser } from "./notifications.service";
 import { NOTIFICATION_TYPES } from "../constants/notificationTypes";
 
 // Dashboard Stats
-export const getDashboardStatsService = async (branchId: number) => {
+export const getDashboardStatsService = async (branchId: string) => {
   const totalStudents = await totalStudentsRepo(branchId);
 
   const activeAssignments = await activeAssignmentsRepo(branchId);
@@ -68,14 +68,14 @@ export const getDashboardStatsService = async (branchId: number) => {
 };
 
 // Professor summary service
-export const getProfessorSummaryService = async (branchId: number) => {
+export const getProfessorSummaryService = async (branchId: string) => {
   return await getProfessorSummaryRepo(branchId);
 };
 
 // Create Professor
 export const createProfessorService = async (
   data: CreateProfessorInput,
-  adminBranchId: number,
+  adminBranchId: string,
 ) => {
   const {
     name,
@@ -100,7 +100,7 @@ export const createProfessorService = async (
   if (exists) throw new Error(EMAIL_MESSAGES.EMAIL_EXISTS);
 
   // Professor Role
-  const role = await findEnumRepo("ROLE", "PROFESSOR");
+  const role = await findEnumRepo("ROLE", "Professor");
   if (!role) throw new Error(PROFESSOR_MESSAGES.PROFESSOR_ROLE);
 
   // Validate & fetch subjects
@@ -189,7 +189,7 @@ export const getAllProfessorService = async (
   page: number,
   limit: number,
   search: string,
-  adminBranchId: number,
+  adminBranchId: string,
 ) => {
   const skip = (page - 1) * limit;
 
@@ -210,8 +210,8 @@ export const getAllProfessorService = async (
 
 // Get Professor by id
 export const getProfessorByIdService = async (
-  id: number,
-  adminBranchId: number,
+  id: string,
+  adminBranchId: string,
 ) => {
   const professor = await getProfessorByIdRepo(id);
 
@@ -224,9 +224,9 @@ export const getProfessorByIdService = async (
 
 // Update Professor
 export const updateProfessorService = async (
-  id: number,
+  id: string,
   data: any,
-  adminBranchId: number,
+  adminBranchId: string,
 ) => {
   // check if professor exists
   const existingProfessor = await getProfessorByIdRepo(id);
@@ -266,8 +266,8 @@ export const updateProfessorService = async (
 
 // Delete Professor
 export const deleteProfessorService = async (
-  id: number,
-  adminBranchId: number,
+  id: string,
+  adminBranchId: string,
 ) => {
   const professor = await getProfessorByIdRepo(id);
 
@@ -293,9 +293,9 @@ export const deleteProfessorService = async (
 
 // Assign subject to existing professor
 export const updateProfessorSubjectsService = async (
-  professorId: number,
-  subjectIds: number[],
-  adminBranchId: number,
+  professorId: string,
+  subjectIds: string[],
+  adminBranchId: string,
 ) => {
   // Professor exists
   const professor = await getProfessorByIdRepo(professorId);
@@ -316,14 +316,16 @@ export const updateProfessorSubjectsService = async (
   // Remove old subjects
   await deleteProfessorSubjectsRepo(professorId);
 
-  // Attach new subject
-  await attachProfessorSubjectRepo(professorId, subjectIds);
-
+  // Attach new subjects only if there are any
+  if (subjectIds.length > 0) {
+    await attachProfessorSubjectRepo(professorId, subjectIds);
+  }
+  
   return { professorId, subjectIds };
 };
 
 // Subjects
-export const getBranchSubjectsService = async (branchId: number) => {
+export const getBranchSubjectsService = async (branchId: string) => {
   if (!branchId) {
     throw new Error(STUDENT_MESSAGES.BRANCHID_MISSING);
   }
@@ -334,13 +336,13 @@ export const getBranchSubjectsService = async (branchId: number) => {
 };
 
 // My profile
-export const getMyProfileService = async (userId: number) => {
+export const getMyProfileService = async (userId: string) => {
   return await findMyProfileRepo(userId);
 };
 
 // Update My Profile
 export const updateMyProfileService = async (
-  userId: number,
+  userId: string,
   data: {
     name: string;
     email: string;

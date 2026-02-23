@@ -2,7 +2,7 @@
 export interface LoginResponse {
   token: string;
   user: {
-    id: number;
+    id: string;
     name: string;
     email: string;
     role: string;
@@ -15,14 +15,15 @@ export interface SignupStudentData {
   email: string;
   contactNumber: string;
   password: string;
-  branchId: number;
-  semesterId: number;
-  yearId: number;
+  branchId: string;
+  semesterId: string;
+  yearId: string;
 }
 
 export interface CreateStudentData extends SignupStudentData {
-  roleId: number;
-  statusId: number;
+  roleId: string;
+  statusId: string;
+  code: string;
 }
 
 // Student data
@@ -31,11 +32,11 @@ export interface createStudentData {
   email: string;
   contactNumber: string;
   password: string;
-  branchId: number;
-  semesterId: number;
-  yearId: number;
-  roleId: number;
-  statusId: number;
+  branchId: string;
+  semesterId: string;
+  yearId: string;
+  roleId: string;
+  statusId: string;
   code: string;
 }
 
@@ -45,7 +46,7 @@ export interface CreateAdminInput {
   email: string;
   contactNumber: string;
   branchValue: string;
-  statusId: number;
+  statusId: string;
 }
 
 // Professor interface
@@ -54,19 +55,19 @@ export interface CreateProfessorInput {
   email: string;
   contactNumber: string;
   branchValue: string;
-  statusId: number;
-  subjectIds: number[];
+  statusId: string;
+  subjectIds: string[];
 }
 
 // User payload interface
 export interface UserPayload {
-  id: number;
+  id: string;
   name: string;
   code: string;
-  roleId: number;
-  branchId: number;
-  semesterId?: number;
-  yearId?: number;
+  roleId: string;
+  branchId: string;
+  semesterId?: string;
+  yearId?: string;
 }
 
 // Assignment interface
@@ -75,8 +76,8 @@ export interface CreateAssignmentInput {
   description: string;
   dueDate: string;
   attachment: string;
-  subjectId: number;
-  semesterId: number;
+  subjectId: string;
+  semesterId: string;
 }
 
 export interface CreateAssignmentRepo {
@@ -84,21 +85,21 @@ export interface CreateAssignmentRepo {
   description: string;
   dueDate: Date;
   attachment: string;
-  subjectId: number;
-  semesterId: number;
-  branchId: number;
-  createdById: number;
+  subjectId: string;
+  semesterId: string;
+  branchId: string;
+  createdById: string;
 }
 
 // Student assignment
 export interface StudentAssignmentFilter {
-  semesterId: number;
-  branchId: number;
+  semesterId: string;
+  branchId: string;
 }
 
 // Update assignment Status
 export interface UpdateAssignmentStatus {
-  assignmentId: number;
-  studentId: number;
-  statusId: number;
+  assignmentId: string;
+  studentId: string;
+  statusId: string;
 }

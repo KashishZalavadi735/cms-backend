@@ -14,35 +14,35 @@ export const findEnumRepo = async (enumType: string, enumValue: string) => {
 };
 
 // Dashboard stats
-export const totalStudentsRepo = async (branchId: number) => {
+export const totalStudentsRepo = async (branchId: string) => {
   return prisma.user.count({
     where: {
       role: {
         enumValue: "Student",
       },
       branchId,
-      deletedAt: null,
+      deletedAt: { isSet: false },
     },
   });
 };
 
-export const professorRepo = async (branchId: number) => {
+export const professorRepo = async (branchId: string) => {
   return prisma.user.count({
     where: {
       role: {
         enumValue: "Professor",
       },
       branchId,
-      deletedAt: null,
+      deletedAt: { isSet: false },
     },
   });
 };
 
-export const activeAssignmentsRepo = async (branchId: number) => {
+export const activeAssignmentsRepo = async (branchId: string) => {
   return prisma.assignment.count({
     where: {
       branchId,
-      deletedAt: null,
+      deletedAt: { isSet: false },
       dueDate: {
         gte: new Date(),
       },
@@ -50,7 +50,7 @@ export const activeAssignmentsRepo = async (branchId: number) => {
   });
 };
 
-export const completedAssignmentsRepo = async (branchId: number) => {
+export const completedAssignmentsRepo = async (branchId: string) => {
   const completedStatus = await prisma.enumTable.findUnique({
     where: {
       enumType_enumValue: {
@@ -67,20 +67,20 @@ export const completedAssignmentsRepo = async (branchId: number) => {
       statusId: completedStatus.id,
       assignment: {
         branchId,
-        deletedAt: null,
+        deletedAt: { isSet: false },
       },
     },
   });
 };
 
-export const getAssignmentsDueThisWeekRepo = async (branchId: number) => {
+export const getAssignmentsDueThisWeekRepo = async (branchId: string) => {
   const today = new Date();
   const nextWeek = new Date();
   nextWeek.setDate(today.getDate() + 7);
 
   return prisma.assignment.count({
     where: {
-      deletedAt: null,
+      deletedAt: { isSet: false },
       branchId,
       dueDate: {
         gte: today,
@@ -90,14 +90,13 @@ export const getAssignmentsDueThisWeekRepo = async (branchId: number) => {
   });
 };
 
-export const getDepartmentsRepo = async (branchId: number) => {
+export const getDepartmentsRepo = async (branchId: string) => {
   const department = await prisma.enumTable.findUnique({
     where: { id: branchId },
     select: { enumValue: true },
   });
 
   return department?.enumValue || "";
-
 };
 
 // Find professor by id
@@ -116,29 +115,30 @@ export const createProfessorRepo = async (
 
 // Subject validation
 export const findSubjectsByIdsRepo = async (
-  subjectIds: number[],
-  branchId: number,
+  subjectIds: string[],
+  branchId: string,
 ) => {
   return prisma.subject.findMany({
     where: {
       id: { in: subjectIds },
       branchId,
-      deletedAt: null,
+      deletedAt: { isSet: false },
     },
   });
 };
 
 // Attach subject
 export const attachProfessorSubjectRepo = async (
-  professorId: number,
-  subjectIds: number[],
+  professorId: string,
+  subjectIds: string[],
 ) => {
+  if (!subjectIds || subjectIds.length === 0) return;
+
   return prisma.professorSubject.createMany({
     data: subjectIds.map((subjectId) => ({
       professorId,
       subjectId,
     })),
-    skipDuplicates: true,
   });
 };
 
@@ -147,7 +147,7 @@ export const getAllProfessorRepo = async (
   skip: number,
   limit: number,
   search: string,
-  branchId: number,
+  branchId: string,
 ) => {
   const whereCondition: Prisma.UserWhereInput = {
     role: { enumValue: "Professor" },
@@ -185,7 +185,7 @@ export const getAllProfessorRepo = async (
 };
 
 // Get Professor by id
-export const getProfessorByIdRepo = async (id: number) => {
+export const getProfessorByIdRepo = async (id: string) => {
   return prisma.user.findFirst({
     where: { id },
     include: {
@@ -205,7 +205,7 @@ export const getProfessorByIdRepo = async (id: number) => {
 };
 
 // Update Professor
-export const updateProfessorRepo = async (id: number, data: any) => {
+export const updateProfessorRepo = async (id: string, data: any) => {
   // Remove branch-related fields
   delete data.branch;
   delete data.branchId;
@@ -219,14 +219,17 @@ export const updateProfessorRepo = async (id: number, data: any) => {
 
 // Delete Professor
 // Soft delete
-export const deleteProfessorRepo = async (id: number) => {
+export const deleteProfessorRepo = async (id: string) => {
   return prisma.user.update({
     where: { id: id },
     data: {
       deletedAt: new Date(),
       status: {
         connect: {
-          id: 26,
+          enumType_enumValue: {
+            enumType: "STATUS",
+            enumValue: "Inactive",
+          },
         },
       },
     },
@@ -234,18 +237,18 @@ export const deleteProfessorRepo = async (id: number) => {
 };
 
 // Assign subject to existing professor
-export const deleteProfessorSubjectsRepo = async (professorId: number) => {
+export const deleteProfessorSubjectsRepo = async (professorId: string) => {
   return prisma.professorSubject.deleteMany({
     where: { professorId },
   });
 };
 
 // Subjects
-export const findSubjectsByBranchRepo = async (branchId: number) => {
+export const findSubjectsByBranchRepo = async (branchId: string) => {
   return prisma.subject.findMany({
     where: {
       branchId,
-      deletedAt: null,
+      deletedAt: { isSet: false },
     },
     include: {
       semester: true,
@@ -257,7 +260,7 @@ export const findSubjectsByBranchRepo = async (branchId: number) => {
 };
 
 // My Profile
-export const findMyProfileRepo = async (userId: number) => {
+export const findMyProfileRepo = async (userId: string) => {
   return prisma.user.findUnique({
     where: {
       id: userId,
@@ -276,7 +279,7 @@ export const findMyProfileRepo = async (userId: number) => {
 
 // Update My Profile
 export const updateMyProfileRepo = async (
-  userId: number,
+  userId: string,
   data: {
     name: string;
     email: string;
@@ -299,7 +302,7 @@ export const updateMyProfileRepo = async (
 };
 
 // Professor summary repo
-export const getProfessorSummaryRepo = async (branchId: number) => {
+export const getProfessorSummaryRepo = async (branchId: string) => {
   // Professor role
   const ProfessorRole = await prisma.enumTable.findUnique({
     where: {
@@ -329,7 +332,7 @@ export const getProfessorSummaryRepo = async (branchId: number) => {
     where: {
       roleId: ProfessorRole.id,
       branchId,
-      deletedAt: null,
+      deletedAt: { isSet: false },
     },
   });
 
@@ -338,7 +341,7 @@ export const getProfessorSummaryRepo = async (branchId: number) => {
     where: {
       professor: {
         branchId,
-        deletedAt: null,
+        deletedAt: { isSet: false },
       },
     },
   });
@@ -348,7 +351,7 @@ export const getProfessorSummaryRepo = async (branchId: number) => {
     where: {
       roleId: ProfessorRole.id,
       branchId,
-      deletedAt: null,
+      deletedAt: { isSet: false },
     },
     orderBy: {
       createdAt: "desc",
@@ -382,7 +385,7 @@ export const findSuperAdminRepo = async () => {
       role: {
         enumValue: "SuperAdmin",
       },
-      deletedAt: null,
+      deletedAt: { isSet: false },
     },
     select: {
       id: true,

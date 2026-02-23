@@ -12,7 +12,6 @@ export const defaultActiveStatus = async (req: Request, res: Response, next: Nex
             where: {
                 enumType: "STATUS_ENUM",
                 enumValue: "Active",
-                deletedAt: null
             },
             select: { id: true }
         });

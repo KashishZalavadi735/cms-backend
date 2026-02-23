@@ -16,7 +16,7 @@ export const findUserByEmailRepo = async (email: string) => {
 
 // Save OTP
 export const saveOtpRepo = async (
-  userId: number,
+  userId: string,
   otp: string,
   expiresAt: Date,
 ) => {
@@ -31,7 +31,7 @@ export const saveOtpRepo = async (
 
 // Find valid OTP 
 export const findValidOtpRepo = async (
-  userId: number,
+  userId: string,
   otp: string,
 ) => {
   return prisma.userOtp.findFirst({
@@ -45,7 +45,7 @@ export const findValidOtpRepo = async (
 };
 
 // Verify OTP
-export const verifyOtpRepo = async (id: number) => {
+export const verifyOtpRepo = async (id: string) => {
   return prisma.userOtp.update({
     where: { id },
     data: { verified: true },
@@ -54,7 +54,7 @@ export const verifyOtpRepo = async (id: number) => {
 
 // Change password
 export const changeUserPasswordRepo = async (
-  userId: number,
+  userId: string,
   hashedPassword: string,
 ) => {
   return prisma.user.update({

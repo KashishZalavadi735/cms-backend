@@ -3,21 +3,21 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
-// ENUM TABLE (ENUM STORAGE)
+// ENUM TABLE
 model EnumTable {
-  id        Int    @id @default(autoincrement())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
 
-  enumType  String @db.VarChar(50)
-  enumValue String @db.VarChar(100)
+  enumType  String
+  enumValue String
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deletedAt     DateTime?
-  
+  deletedAt DateTime?
+
   @@unique([enumType, enumValue])
 
   // Relations
@@ -27,132 +27,123 @@ model EnumTable {
   userYears       User[] @relation("UserYear")
   userStatuses    User[] @relation("UserStatus")
 
-  // Subject enums
   subjectBranches  Subject[] @relation("SubjectBranch")
   subjectSemesters Subject[] @relation("SubjectSemester")
 
-  // Assignment enums
   assignmentBranches  Assignment[] @relation("AssignmentBranch")
   assignmentSemesters Assignment[] @relation("AssignmentSemester")
 
-  // Assignment status enum
   assignmentStatuses AssignmentStatus[] @relation("AssignmentStatusEnum")
 
-  // Notification enums
   notificationTypes      Notification[] @relation("NotificationType")
   notificationReadStatus Notification[] @relation("NotificationReadStatus")
 }
 
-// USER (SUPER ADMIN / ADMIN / PROFESSOR / STUDENT)
+// USER
 model User {
-  id                     Int           @id @default(autoincrement())
-  name                   String        @default("")
-  email                  String        @unique
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  name                   String   @default("")
+  email                  String   @unique
   contactNumber          String
   password               String?
 
-  // Set password (link-based)
   passwordSetupToken     String?
   passwordSetupExpiresAt DateTime?
 
-  code                   String       @unique
+  code                   String   @unique
 
-  roleId                 Int
-  branchId               Int
-  semesterId             Int?
-  yearId                 Int?       
-  statusId               Int 
+  roleId                 String   @db.ObjectId
+  branchId               String   @db.ObjectId
+  semesterId             String?  @db.ObjectId
+  yearId                 String?  @db.ObjectId
+  statusId               String   @db.ObjectId
 
-  createdAt              DateTime      @default(now())
-  updatedAt              DateTime      @updatedAt
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
   deletedAt              DateTime?
 
-  //Enum Relation
-  role                   EnumTable           @relation("UserRole", fields: [roleId], references: [id])    
-  branch                 EnumTable           @relation("UserBranch", fields: [branchId], references: [id])    
-  semester               EnumTable?          @relation("UserSemester", fields: [semesterId], references: [id])    
-  year                   EnumTable?          @relation("UserYear", fields: [yearId], references: [id])    
-  status                 EnumTable           @relation("UserStatus", fields: [statusId], references: [id])
-
-  //Relations
-  professorSubjects      ProfessorSubject[]
-  createdAssignments     Assignment[]        @relation("CreatedAssignments")
-  assignmentStatuses     AssignmentStatus[]
-  otps                   UserOtp[]
-  notifications          Notification[]
-}
-
-// SUBJECT TABLE
-model Subject {
-  id            Int           @id @default(autoincrement())
-  name          String
-  branchId      Int
-  semesterId    Int
-
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  deletedAt     DateTime?
-
   // Enum relations
-  branch        EnumTable     @relation("SubjectBranch", fields: [branchId], references: [id])
-  semester      EnumTable     @relation("SubjectSemester", fields: [semesterId], references: [id])
+  role     EnumTable  @relation("UserRole", fields: [roleId], references: [id])
+  branch   EnumTable  @relation("UserBranch", fields: [branchId], references: [id])
+  semester EnumTable? @relation("UserSemester", fields: [semesterId], references: [id])
+  year     EnumTable? @relation("UserYear", fields: [yearId], references: [id])
+  status   EnumTable  @relation("UserStatus", fields: [statusId], references: [id])
 
-  //Relations
-  professors    ProfessorSubject[]
-  assignments   Assignment[]
-
-  @@unique([name, branchId, semesterId], name: "name_branchId_semesterId")
+  // Relations
+  professorSubjects  ProfessorSubject[]
+  createdAssignments Assignment[] @relation("CreatedAssignments")
+  assignmentStatuses AssignmentStatus[]
+  otps               UserOtp[]
+  notifications      Notification[]
 }
 
-// PROFESSOR - SUBJECT (MANY TO MANY)
-model ProfessorSubject {
-  id            Int           @id @default(autoincrement())
-  professorId   Int
-  subjectId     Int
-  
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+// SUBJECT
+model Subject {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  branchId   String   @db.ObjectId
+  semesterId String   @db.ObjectId
 
-  professor     User          @relation(fields: [professorId], references: [id])
-  subject       Subject       @relation(fields: [subjectId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  deletedAt  DateTime?
+
+  branch   EnumTable @relation("SubjectBranch", fields: [branchId], references: [id])
+  semester EnumTable @relation("SubjectSemester", fields: [semesterId], references: [id])
+
+  professors  ProfessorSubject[]
+  assignments Assignment[]
+
+  @@unique([name, branchId, semesterId])
+}
+
+// PROFESSOR SUBJECT
+model ProfessorSubject {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  professorId String   @db.ObjectId
+  subjectId   String   @db.ObjectId
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  professor   User    @relation(fields: [professorId], references: [id])
+  subject     Subject @relation(fields: [subjectId], references: [id])
 
   @@unique([professorId, subjectId])
 }
 
-// ASSIGNMENT (CREATED BY ADMIN / PROFESSOR)
+// ASSIGNMENT
 model Assignment {
-  id            Int           @id @default(autoincrement())
-  title         String
-  description   String
-  dueDate       DateTime
-  attachment    String
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  description  String
+  dueDate      DateTime
+  attachment   String
 
-  subjectId     Int
-  branchId      Int
-  semesterId    Int
-  createdById   Int
+  subjectId    String   @db.ObjectId
+  branchId     String   @db.ObjectId
+  semesterId   String   @db.ObjectId
+  createdById  String   @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
 
-  // Enum relations
-  branch   EnumTable @relation("AssignmentBranch", fields: [branchId], references: [id])
-  semester EnumTable @relation("AssignmentSemester", fields: [semesterId], references: [id])
+  branch    EnumTable @relation("AssignmentBranch", fields: [branchId], references: [id])
+  semester  EnumTable @relation("AssignmentSemester", fields: [semesterId], references: [id])
 
-  // Relations
   subject   Subject @relation(fields: [subjectId], references: [id])
   createdBy User    @relation("CreatedAssignments", fields: [createdById], references: [id])
 
   statuses AssignmentStatus[]
 }
 
-// ASSIGNMENT STATUS (STUDENT SIDE)
+// ASSIGNMENT STATUS
 model AssignmentStatus {
-  id            Int           @id @default(autoincrement())
-  studentId      Int
-  assignmentId  Int
-  statusId      Int
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  studentId    String   @db.ObjectId
+  assignmentId String   @db.ObjectId
+  statusId     String   @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -165,39 +156,37 @@ model AssignmentStatus {
   @@unique([studentId, assignmentId])
 }
 
-// OTP
+// USER OTP
 model UserOtp {
-  id        Int       @id @default(autoincrement())
-  userId    Int
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
   otp       String
   expiresAt DateTime
-  verified  Boolean   @default(false)
+  verified  Boolean  @default(false)
 
-  createdAt DateTime  @default(now())
+  createdAt DateTime @default(now())
 
-  // Relations
-  user      User      @relation(fields: [userId], references: [id])
+  user      User @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
 
 // NOTIFICATION
 model Notification {
-  id            Int      @id @default(autoincrement())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
 
-  userId        Int
-  title         String
-  message       String
+  userId       String   @db.ObjectId
+  title        String
+  message      String
 
-  typeId        Int
-  readStatusId  Int
+  typeId       String   @db.ObjectId
+  readStatusId String   @db.ObjectId
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  deletedAt     DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime?
 
-  // Relations
-  user          User      @relation(fields: [userId], references: [id])
-  type          EnumTable @relation("NotificationType", fields: [typeId], references: [id])
-  readStatus    EnumTable @relation("NotificationReadStatus", fields: [readStatusId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
+  type       EnumTable @relation("NotificationType", fields: [typeId], references: [id])
+  readStatus EnumTable @relation("NotificationReadStatus", fields: [readStatusId], references: [id])
 }

@@ -15,7 +15,7 @@ import {
 import { notifyUser } from "./notifications.service";
 import { NOTIFICATION_TYPES } from "../constants/notificationTypes";
 
-const ROLE_PROFESSOR = 3;
+const ROLE_PROFESSOR = "699ae47e72c616108d3aff2d";
 
 // Assignment summary
 export const getAssignmentSummaryService = async (user: UserPayload) => {
@@ -36,15 +36,12 @@ export const createAssignmentService = async (
     data;
 
   // Convert to numbers
-  const subjectIdNum = Number(subjectId);
-  const semesterIdNum = Number(semesterId);
+  const subjectIds = String(subjectId);
+  const semesterIds = String(semesterId);
 
-  if (Number.isNaN(subjectIdNum) || Number.isNaN(semesterIdNum)) {
-    throw new Error("Invalid subject or semester ID");
-  }
   // Business rule → Professor can assign only own subjects
   if (user.roleId === ROLE_PROFESSOR) {
-    const isAllowed = await professorSubjectRepo(user.id, subjectIdNum);
+    const isAllowed = await professorSubjectRepo(user.id, subjectIds);
 
     if (!isAllowed) {
       throw new Error("You are not assigned to this subject");
@@ -56,14 +53,14 @@ export const createAssignmentService = async (
     description,
     dueDate: new Date(dueDate),
     attachment: data.attachment,
-    subjectId: subjectIdNum,
-    semesterId: semesterIdNum,
+    subjectId: subjectIds,
+    semesterId: semesterIds,
     branchId: user.branchId,
     createdById: user.id,
   });
 
   // Notification for student
-  const students = await findStudentRepo(user.branchId, semesterIdNum);
+  const students = await findStudentRepo(user.branchId, semesterIds);
 
   if (students.length > 0) {
     await notifyUser({
@@ -80,7 +77,7 @@ export const createAssignmentService = async (
 // Assignement Subjects
 export const getSubjectsForAssignmentService = async (
   user: UserPayload,
-  semesterId: number,
+  semesterId: string,
 ) => {
   // For Professor
   if (user.roleId === ROLE_PROFESSOR) {
@@ -124,8 +121,8 @@ export const getAssignmentsForStudentService = async (student: UserPayload) => {
 // Change assignement status (students)
 export const updateAssignmentStatusService = async (
   student: UserPayload,
-  assignmentId: number,
-  statusId: number,
+  assignmentId: string,
+  statusId: string,
 ) => {
   const updatedStatus = await updateAssignmentStatusRepo({
     assignmentId,

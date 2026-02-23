@@ -5,7 +5,7 @@ export const getBranchStudentsService = async (
   page: number,
   limit: number,
   search: string,
-  branchId: number,
+  branchId: string,
 ) => {
 
   const skip = (page - 1) * limit;

@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import prisma from "../config/prisma";
 
-export const createSetPasswordLink = async (userId: number) => {
+export const createSetPasswordLink = async (userId: string) => {
     const rawToken = crypto.randomBytes(32).toString("hex");
 
     const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");

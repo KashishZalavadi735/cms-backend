@@ -22,9 +22,21 @@ import {
 
 interface AuthRequest extends Request {
   user?: {
-    id: number;
+    id: string;
   };
 }
+
+// Dashboard Stats
+export const getDashboardStats = async (req: Request, res: Response) => {
+  try {
+    const stats = await getDashboardStatsService();
+
+    return successResponse(res, DASHBOARD_MESSAGES.CARDS, stats, 200);
+  } catch (error: any) {
+    console.log("Dashboard error:", error);
+    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
+  }
+};
 
 // Create Admin
 export const createAdmin = async (req: Request, res: Response) => {
@@ -52,9 +64,9 @@ export const createAdmin = async (req: Request, res: Response) => {
 // Get all admin
 export const getAllAdmin = async (req: Request, res: Response) => {
   try {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 5;
-    const search = String(req.query.search || "");
+    const page = Number(Array.isArray(req.query.page) ? req.query.page[0] : req.query.page) || 1;
+    const limit = Number(Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit) || 5;
+    const search = String(Array.isArray(req.query.search) ? req.query.search[0] : req.query.search || "");
 
     const adminData = await getAllAdminService(page, limit, search);
 
@@ -69,7 +81,7 @@ export const getAllAdmin = async (req: Request, res: Response) => {
 export const getAdminById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const admin = await getAdminByIdService(Number(id));
+    const admin = await getAdminByIdService(Array.isArray(id) ? id[0] : id);
 
     return successResponse(res, ADMIN_MESSAGES.ADMIN, admin, 200);
   } catch (error: any) {
@@ -83,7 +95,10 @@ export const updateAdmin = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const updatedAdmin = await updateAdminService(Number(id), req.body);
+    const updatedAdmin = await updateAdminService(
+      Array.isArray(id) ? id[0] : id,
+      req.body,
+    );
 
     return successResponse(res, ADMIN_MESSAGES.ADMIN_UPDATE, updatedAdmin, 200);
   } catch (error: any) {
@@ -97,7 +112,9 @@ export const deleteAdmin = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const deletedAdmin = await deleteAdminService(Number(id));
+    const deletedAdmin = await deleteAdminService(
+      Array.isArray(id) ? id[0] : id,
+    );
 
     return successResponse(res, ADMIN_MESSAGES.ADMIN_DELETE, deletedAdmin, 200);
   } catch (error: any) {
@@ -130,17 +147,7 @@ export const updateMyProfile = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// Dashboard Stats
-export const getDashboardStats = async (req: Request, res: Response) => {
-  try {
-    const stats = await getDashboardStatsService();
 
-    return successResponse(res, DASHBOARD_MESSAGES.CARDS, stats, 200);
-  } catch (error: any) {
-    console.log("Dashboard error:", error);
-    return errorResponse(res, SERVER_MESSAGES.SERVER_ERROR, 500, error.message);
-  }
-};
 
 // Admin Summary
 export const getAdminSummary = async (req: Request, res: Response) => {

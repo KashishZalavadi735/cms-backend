@@ -9,11 +9,11 @@ import { DASHBOARD_MESSAGES, PROFILE_MESSAGES, SERVER_MESSAGES } from "../consta
 
 interface AuthRequest extends Request {
   user?: {
-    id: number;
+    id: string;
     name: string;
     email: string;
-    roleId: number;
-    branchId: number;
+    roleId: string;
+    branchId: string;
   };
 }
 
