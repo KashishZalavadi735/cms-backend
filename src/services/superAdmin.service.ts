@@ -124,9 +124,12 @@ export const createAdminService = async (data: CreateAdminInput) => {
   );
 
   // Send email
-  sendEmail(email, "Set Your Password - CMS", htmlContent)
-    .then(() => console.log("📧 Admin email sent"))
-    .catch((err) => console.error("📧 Email failed:", err));
+  try {
+    await sendEmail(email, "Set Your Password - CMS", htmlContent);
+  } catch (error) {
+    console.error("Email sending failed:", error);
+    throw new Error("Admin created but email sending failed");
+  }
 
   return {
     admin: createdAdmin,
