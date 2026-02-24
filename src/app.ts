@@ -24,7 +24,7 @@ app.use("/public", express.static(path.join(__dirname, "../public")));
 
 app.use(
   cors({
-    origin: "https://cms-frontend-jxxb.vercel.app",
+    origin: "https://cms-frontend-smoky-zeta.vercel.app",
     credentials: true,
   }),
 );
