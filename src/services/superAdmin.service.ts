@@ -106,9 +106,10 @@ export const createAdminService = async (data: CreateAdminInput) => {
   // Notification for admin
   await notifyUser({
     title: "Account Created",
-    message: "Your admin (HOD) account has been created. Please check your email to set your password.",
+    message:
+      "Your admin (HOD) account has been created. Please check your email to set your password.",
     typeEnumValue: NOTIFICATION_TYPES.ACCOUNT,
-    userIds: [createdAdmin.id]
+    userIds: [createdAdmin.id],
   });
 
   // Generate set-password link
@@ -123,7 +124,11 @@ export const createAdminService = async (data: CreateAdminInput) => {
   );
 
   // Send email
-  await sendEmail(email, "Set Your Password - CMS", htmlContent);
+  try {
+    await sendEmail(email, "Set Your Password - CMS", htmlContent);
+  } catch (mailError) {
+    console.error("Email failed but admin created:", mailError);
+  }
 
   return {
     admin: createdAdmin,
@@ -239,4 +244,3 @@ export const updateMyProfileService = async (
 
   return await updateMyProfileRepo(userId, updateData);
 };
-
