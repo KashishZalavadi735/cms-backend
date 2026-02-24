@@ -126,7 +126,7 @@ export const deleteAdminRepo = async (id: string) => {
   const inactiveStatus = await prisma.enumTable.findUnique({
     where: {
       enumType_enumValue: {
-        enumType: "STATUS",
+        enumType: "STATUS_ENUM",
         enumValue: "Inactive",
       },
     },
