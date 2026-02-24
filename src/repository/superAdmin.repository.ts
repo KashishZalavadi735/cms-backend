@@ -123,17 +123,25 @@ export const updateAdminRepo = async (id: string, data: any): Promise<User> => {
 // Delete admin
 // Soft delete
 export const deleteAdminRepo = async (id: string) => {
+  const inactiveStatus = await prisma.enumTable.findUnique({
+    where: {
+      enumType_enumValue: {
+        enumType: "STATUS",
+        enumValue: "Inactive",
+      },
+    },
+  });
+
+  if (!inactiveStatus) {
+    throw new Error("Inactive status not found");
+  }
+
   return prisma.user.update({
-    where: { id: id },
+    where: { id },
     data: {
       deletedAt: new Date(),
       status: {
-        connect: {
-          enumType_enumValue: {
-            enumType: "STATUS",
-            enumValue: "Inactive",
-          },
-        },
+        connect: { id: inactiveStatus.id },
       },
     },
   });
