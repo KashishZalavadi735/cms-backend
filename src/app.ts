@@ -22,12 +22,18 @@ const app = express();
 // Image import
 app.use("/public", express.static(path.join(__dirname, "../public")));
 
-app.use(
-  cors({
-    origin: "https://cms-frontend-smoky-zeta.vercel.app",
-    credentials: true,
-  }),
-);
+app.use(cors({
+  origin: [
+    "https://cms-frontend-smoky-zeta.vercel.app",
+    "http://localhost:3000"
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+// THIS LINE IS REQUIRED
+app.options("*", cors());
 
 app.use(express.json());
 
