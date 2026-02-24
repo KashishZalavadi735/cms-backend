@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>EMS Backend API – Documentation</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f9fc;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        h2 {
+            margin-top: 35px;
+            color: #34495e;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        .endpoint {
+            background: #ffffff;
+            border-left: 5px solid #3498db;
+            padding: 15px;
+            margin-top: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .method {
+            font-weight: bold;
+            color: #e67e22;
+        }
+
+        code {
+            display: block;
+            background: #f4f4f4;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+
+        .url {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .note {
+            color: #c0392b;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>EMS Backend API – Documentation</h1>
+    <p><strong>Base URL:</strong> <span class="url">http://localhost:5000</span></p>
+    <p class="note">🔐 All protected routes require: Authorization: Bearer &lt;TOKEN&gt;</p>
+
+    <!-- AUTH -->
+    <h2>Authentication</h2>
+
+    <div class="endpoint">
+        <span class="method">POST</span> Login (All Roles)
+        <code>
+POST /api/auth/login
+
+{
+  "email": "super.admin@cms.com",
+  "password": "superadmin@735"
+}
+        </code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">POST</span> Student Signup
+        <code>
+POST /api/auth/signup
+
+{
+  "name": "Jini Patel",
+  "email": "jinipatel@gmail.com",
+  "contactNumber": "7852145698",
+  "password": "jini@123",
+  "branchId": "",
+  "semesterId": "",
+  "yearId": ""
+}
+        </code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">POST</span> Set Password
+        <code>
+POST /api/set-password
+
+{
+  "token": "",
+  "password": "",
+  "confirmPassword": ""
+}
+        </code>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <h2>Forgot Password</h2>
+
+    <div class="endpoint">
+        <span class="method">POST</span> Send OTP
+        <code>
+POST /api/forgot-password/send-otp
+
+{
+  "email": "jinipatel@gmail.com"
+}
+        </code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">POST</span> Verify OTP
+        <code>
+POST /api/forgot-password/verify-otp
+
+{
+  "email": "jinipatel@gmail.com",
+  "otp": ""
+}
+        </code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">POST</span> Change Password
+        <code>
+POST /api/forgot-password/change-password
+
+{
+  "email": "jinipatel@gmail.com",
+  "newPassword": "",
+  "confirmPassword": ""
+}
+        </code>
+    </div>
+
+    <!-- SUPER ADMIN -->
+    <h2>Super Admin (Token Required)</h2>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Dashboard Cards
+        <code>GET /api/super-admin/dashboard-cards</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Admin Summary
+        <code>GET /api/super-admin/admin/summary</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">POST</span> Create Admin
+        <code>
+POST /api/super-admin/admin
+
+{
+  "name": "Kashish Zalavadi",
+  "email": "kashishzalavadi@gmail.com",
+  "contactNumber": "9428187521",
+  "branchValue": "Chemical Engineering"
+}
+        </code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Get All Admin
+        <code>GET /api/super-admin/admin</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Get Admin By ID
+        <code>GET /api/super-admin/admin/:id</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">PUT</span> Update Admin
+        <code>
+PUT /api/super-admin/admin/:id
+
+{
+  "name": "Sumit Zala",
+  "email": "sumitzala@gmail.com",
+  "contactNumber": "942817522"
+}
+        </code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">DELETE</span> Delete Admin
+        <code>DELETE /api/super-admin/admin/:id</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">GET</span> My Profile
+        <code>GET /api/super-admin/me</code>
+    </div>
+
+    <!-- ADMIN -->
+    <h2>Admin (Token Required)</h2>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Dashboard Cards
+        <code>GET /api/admin/dashboard-cards</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Professor Summary
+        <code>GET /api/admin/professor/summary</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">POST</span> Create Professor
+        <code>
+POST /api/admin/professor
+
+{
+  "name": "Sujal Zala",
+  "email": "sujalzala66@gmail.com",
+  "contactNumber": "9876543210",
+  "branchValue": "Chemical Engineering"
+}
+        </code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Get All Professors
+        <code>GET /api/admin/professor</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Get Professor By ID
+        <code>GET /api/admin/professor/:id</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">PUT</span> Update Professor
+        <code>
+PUT /api/admin/professor/:id
+
+{
+  "name": "Kalpesh P. Kumavat"
+}
+        </code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">DELETE</span> Delete Professor
+        <code>DELETE /api/admin/professor/:id</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">PUT</span> Assign Subjects to Professor
+        <code>
+PUT /api/admin/professor/:id/subjects
+
+{
+  "subjectIds": ["", "", ""]
+}
+        </code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Get Subjects (By Branch)
+        <code>GET /api/admin/subjects</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">GET</span> My Profile
+        <code>GET /api/admin/me</code>
+    </div>
+
+    <!-- PROFESSOR -->
+    <h2>Professor (Token Required)</h2>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Dashboard Cards
+        <code>GET /api/professor/dashboard-cards</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">GET</span> My Profile
+        <code>GET /api/professor/me</code>
+    </div>
+
+    <!-- STUDENT -->
+    <h2>Student (Token Required)</h2>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Dashboard Cards
+        <code>GET /api/student/dashboard-cards</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">GET</span> My Profile
+        <code>GET /api/student/me</code>
+    </div>
+
+    <!-- ASSIGNMENTS -->
+    <h2>Assignments</h2>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Assignment Summary (Admin / Professor)
+        <code>GET /api/assignment/summary</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">POST</span> Create Assignment
+        <code>
+POST /api/assignment
+
+{
+  "title": "Assignment – Water Treatment",
+  "description": "Study of purification methods",
+  "dueDate": "2026-02-01",
+  "subjectId": "",
+  "semesterId": ""
+}
+        </code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Get Assignments (Student)
+        <code>GET /api/assignment/students</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">PUT</span> Change Assignment Status
+        <code>
+PUT /api/assignment/:assignmentId/status
+
+{
+  "statusId": ""
+}
+        </code>
+    </div>
+
+    <!-- BRANCH STUDENTS -->
+    <h2>Branch Students</h2>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Get Branch Students
+        <code>GET /api/branch-student</code>
+    </div>
+
+    <!-- ENUMS -->
+    <h2>Enums</h2>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Get Enum by Type
+        <code>GET /api/enums/BRANCH</code>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <h2>Notifications</h2>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Get My Notifications
+        <code>GET /api/notifications</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">GET</span> Get Unread Count
+        <code>GET /api/notifications/unread-count</code>
+    </div>
+
+    <div class="endpoint">
+        <span class="method">PATCH</span> Mark Notification as Read
+        <code>PATCH /api/notifications/:id/read</code>
+    </div>
+
+</body>
+
+</html>

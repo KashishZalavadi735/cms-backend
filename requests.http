@@ -1,10 +1,14 @@
-### LOGIN
+#################################
+# AUTH
+#################################
+
+### LOGIN (ALL ROLES)
 POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
-    "email": "super.admin@cms.com",
-    "password": "superadmin@735"
+  "email": "super.admin@cms.com",
+  "password": "superadmin@735"
 }
 
 ### STUDENT SIGNUP
@@ -12,148 +16,225 @@ POST http://localhost:5000/api/auth/signup
 Content-Type: application/json
 
 {
-    "name": "Jini Patel",
-    "email": "jinipatel@gmail.com",
-    "contactNumber": "7852145698",
-    "password": "jini@123",
-    "branchId": 9,
-    "semesterId": 13,
-    "yearId": 22
+  "name": "Jini Patel",
+  "email": "jinipatel@gmail.com",
+  "contactNumber": "7852145698",
+  "password": "jini@123",
+  "branchId": "",
+  "semesterId": "",
+  "yearId": ""
 }
 
-### SUPER ADMIN
+
+###### SET PASSWORD
+
+### SET PASSWORD
+POST http://localhost:5000/api/set-password
+Content-Type: application/json
+
+{
+  "token": "",
+  "password": "",
+  "confirmPassword": ""
+}
+
+##### FORGOT PASSWORD
+### SEND OTP
+POST http://localhost:5000/api/forgot-password/send-otp
+Content-Type: application/json
+
+{
+  "email": "jinipatel@gmail.com"
+}
+
+### VERIFY OTP
+POST http://localhost:5000/api/forgot-password/verify-otp
+Content-Type: application/json
+
+{
+  "email": "jinipatel@gmail.com",
+  "otp": ""
+}
+
+### CHANGE PASSWORD
+POST http://localhost:5000/api/forgot-password/change-password
+Content-Type: application/json
+
+{
+  "email": "jinipatel@gmail.com",
+  "newPassword": "",
+  "confirmPassword": ""
+}
+
+#################################
+# SUPER ADMIN (TOKEN REQUIRED)
+#################################
+
+### DASHBOARD CARDS
+GET http://localhost:5000/api/super-admin/dashboard-cards
+
+### ADMIN SUMMARY
+GET http://localhost:5000/api/super-admin/admin/summary
 
 ### CREATE ADMIN
 POST http://localhost:5000/api/super-admin/admin
 Content-Type: application/json
 
 {
-    "name": "Kashish Zalavadi",
-    "email": "kashishzalavadi@gmail.com",
-    "contactNumber": "9428187521",
-    "branchValue": "Chemical Engineering"
+  "name": "Kashish Zalavadi",
+  "email": "kashishzalavadi@gmail.com",
+  "contactNumber": "9428187521",
+  "branchValue": "Chemical Engineering"
 }
 
 ### GET ALL ADMIN
 GET http://localhost:5000/api/super-admin/admin
-Content-Type: application/json
 
 ### GET ADMIN BY ID
-GET http://localhost:5000/api/super-admin/admin/5
-Content-Type: application/json
+GET http://localhost:5000/api/super-admin/admin/:id
 
 ### UPDATE ADMIN
-PUT http://localhost:5000/api/super-admin/admin/4
+PUT http://localhost:5000/api/super-admin/admin/:id
 Content-Type: application/json
 
 {
-    "name": "Sumit Zala",
-    "email": "sumitzala@gmail.com",
-    "contactNumber": "942817522"
+  "name": "Sumit Zala",
+  "email": "sumitzala@gmail.com",
+  "contactNumber": "942817522"
 }
 
 ### DELETE ADMIN
-DELETE http://localhost:5000/api/super-admin/admin/4
+DELETE http://localhost:5000/api/super-admin/admin/:id
 
-### MY PROFILE 
+### MY PROFILE
 GET http://localhost:5000/api/super-admin/me
-Content-Type: application/json
 
+#################################
+# ADMIN (TOKEN REQUIRED)
+#################################
 
-### ADMIN
+### DASHBOARD CARDS
+GET http://localhost:5000/api/admin/dashboard-cards
+
+### PROFESSOR SUMMARY
+GET http://localhost:5000/api/admin/professor/summary
 
 ### CREATE PROFESSOR
 POST http://localhost:5000/api/admin/professor
 Content-Type: application/json
-# Branch value must be same as Admin Branch
+
 {
   "name": "Sujal Zala",
   "email": "sujalzala66@gmail.com",
   "contactNumber": "9876543210",
-  "branchValue": "Chemical Engineering",
-  "statusId": 25
+  "branchValue": "Chemical Engineering"
 }
 
 ### GET ALL PROFESSOR
 GET http://localhost:5000/api/admin/professor
-Content-Type: application/json
 
 ### GET PROFESSOR BY ID
-GET http://localhost:5000/api/admin/professor/6
-Content-Type: application/json
+GET http://localhost:5000/api/admin/professor/:id
 
 ### UPDATE PROFESSOR
-PUT http://localhost:5000/api/admin/professor/7
+PUT http://localhost:5000/api/admin/professor/:id
 Content-Type: application/json
+
 {
   "name": "Kalpesh P. Kumavat"
 }
 
 ### DELETE PROFESSOR
-DELETE http://localhost:5000/api/admin/professor/7
-Content-Type: application/json
+DELETE http://localhost:5000/api/admin/professor/:id
 
-### ASSIGN SUBJECT TO PROFESSOR
-PUT http://localhost:5000/api/admin/professor/7/subjects
+### ASSIGN SUBJECTS TO PROFESSOR
+PUT http://localhost:5000/api/admin/professor/:id/subjects
 Content-Type: application/json
 
 {
-    "subjectIds": [161, 172, 183]
+  "subjectIds": ["", "", ""]
 }
 
-### VIEW STUDENTS (HOD/ADMIN)
-GET http://localhost:5000/api/admin/students
-Content-Type: application/json
+### GET SUBJECTS (BY BRANCH)
+GET http://localhost:5000/api/admin/subjects
 
-### MY PROFILE 
+### MY PROFILE
 GET http://localhost:5000/api/admin/me
-Content-Type: application/json
 
+#################################
+# PROFESSOR (TOKEN REQUIRED)
+#################################
 
-### PROFESSOR
+### DASHBOARD CARDS
+GET http://localhost:5000/api/professor/dashboard-cards
 
-### VIEW STUDENTS (PROFESSOR)
-GET http://localhost:5000/api/professor/students
-Content-Type: application/json
-
-### MY PROFILE 
+### MY PROFILE
 GET http://localhost:5000/api/professor/me
-Content-Type: application/json
 
+#################################
+# STUDENT (TOKEN REQUIRED)
+#################################
 
-### STUDENT
+### DASHBOARD CARDS
+GET http://localhost:5000/api/student/dashboard-cards
 
-### MY PROFILE 
+### MY PROFILE
 GET http://localhost:5000/api/student/me
-Content-Type: application/json
 
+#################################
+# ASSIGNMENT
+#################################
 
-### ASSIGNMENT
+### ASSIGNMENT SUMMARY (ADMIN / PROFESSOR)
+GET http://localhost:5000/api/assignment/summary
 
 ### CREATE ASSIGNMENT (ADMIN / PROFESSOR)
 POST http://localhost:5000/api/assignment
 Content-Type: application/json
 
 {
-    "title": "Assignment – Water Treatment",
-    "description": "Study of water hardness, alkalinity, and purification methods including ion exchange and reverse osmosis. Explain industrial applications with neat diagrams.",
-    "dueDate": "2026-02-01",
-    "subjectId": 161,
-    "semesterId": 10,
-    "attachment": "null"
+  "title": "Assignment – Water Treatment",
+  "description": "Study of purification methods",
+  "dueDate": "2026-02-01",
+  "subjectId": "",
+  "semesterId": ""
 }
 
 ### GET ASSIGNMENTS (STUDENT)
 GET http://localhost:5000/api/assignment/students
-Content-Type: application/json
 
-### CHANGE ASSIGNMENT STATUS (STUNDENT)
-PUT http://localhost:5000/api/assignment/1/status
+### CHANGE ASSIGNMENT STATUS (STUDENT)
+PUT http://localhost:5000/api/assignment/:assignmentId/status
 Content-Type: application/json
 
 {
-  "statusId": 20
+  "statusId": ""
 }
 
-### ENUMS
+#################################
+# BRANCH STUDENTS
+#################################
+
+### GET BRANCH STUDENTS (ADMIN / PROFESSOR)
+GET http://localhost:5000/api/branch-student
+
+#################################
+# ENUMS
+#################################
+
+### GET ENUM BY TYPE
 GET http://localhost:5000/api/enums/BRANCH
+
+#################################
+# NOTIFICATIONS
+#################################
+
+### GET MY NOTIFICATIONS
+GET http://localhost:5000/api/notifications
+
+
+### GET UNREAD COUNT
+GET http://localhost:5000/api/notifications/unread-count
+
+### MARK AS READ
+PATCH http://localhost:5000/api/notifications/:id/read
