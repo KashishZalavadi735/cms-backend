@@ -9,9 +9,6 @@ export const sendEmail = async (to: string, subject: string, htmlContent: string
     },
   });
 
-  // Verify SMTP connection
-  await transporter.verify();
-
   return transporter.sendMail({
     from: process.env.EMAIL_USER,
     to,
