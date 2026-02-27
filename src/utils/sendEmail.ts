@@ -1,26 +1,26 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendEmail = async (
   to: string,
   subject: string,
   htmlContent: string,
 ) => {
+  try {
+    const { error } = await resend.emails.send({
+      from: process.env.EMAIL_FROM!,
+      to,
+      subject,
+      html: htmlContent,
+    });
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  await transporter.verify();
-
-  return transporter.sendMail({
-    from: `"CMS Admin" <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    html: htmlContent, // Send HTML instead of plain text
-    text: "Please view this email in HTML-supported client",
-  });
+    if (error) {
+      console.error("Resend error:", error);
+      throw new Error("Failed to send email");
+    }
+  } catch (err) {
+    console.error("Email send failed:", err);
+    throw err;
+  }
 };
