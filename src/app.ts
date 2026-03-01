@@ -29,6 +29,12 @@ app.use(cors({
 // Image import
 app.use("/public", express.static(path.join(__dirname, "../public")));
 
+// ROOT 
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "src", "index.html"));
+});
+
+
 app.use(express.json());
 
 // Routes
