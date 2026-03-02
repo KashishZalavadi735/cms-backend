@@ -123,17 +123,26 @@ export const createAdminService = async (data: CreateAdminInput) => {
     setPasswordLink,
   );
 
-  // Send email
+  // Send email — log error but DO NOT throw, admin is already created
+  let emailSent = true;
   try {
     await sendEmail(email, "Set Your Password - CMS", htmlContent);
-  } catch (error) {
-    console.error("Email sending failed:", error);
-    throw new Error("Admin created but email sending failed");
+    console.log(`Email sent successfully to ${email}`);
+  } catch (error: any) {
+    emailSent = false;
+    console.error(" Email sending failed:");
+    console.error("  Message:", error.message);
+    console.error("  Code:", error.code);
+    console.error("  Response:", error.response);
+    console.error("  Full error:", JSON.stringify(error, null, 2));
   }
 
   return {
     admin: createdAdmin,
-    message: "Admin created & Credentials sent to email",
+    emailSent,
+    message: emailSent
+      ? "Admin created & credentials sent to email"
+      : "Admin created but email delivery failed. Please resend manually.",
   };
 };
 
