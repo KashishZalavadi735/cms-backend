@@ -1,17 +1,15 @@
 import nodemailer from "nodemailer";
+import { google } from "googleapis";
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-  connectionTimeout: 10000,
+const OAuth2 = google.auth.OAuth2;
+
+const oauth2Client = new OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET
+);
+
+oauth2Client.setCredentials({
+  refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
 });
 
 export const sendEmail = async (
@@ -20,6 +18,20 @@ export const sendEmail = async (
   htmlContent: string
 ): Promise<void> => {
   try {
+    const accessToken = await oauth2Client.getAccessToken();
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        type: "OAuth2",
+        user: process.env.EMAIL_USER,
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+        accessToken: accessToken.token || "",
+      },
+    });
+
     const info = await transporter.sendMail({
       from: `"CMS Admin" <${process.env.EMAIL_USER}>`,
       to,
