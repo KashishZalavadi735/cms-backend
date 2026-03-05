@@ -1,33 +1,31 @@
 import nodemailer from "nodemailer";
 
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
 export const sendEmail = async (
   to: string,
   subject: string,
-  htmlContent: string,
+  htmlContent: string
 ): Promise<void> => {
   try {
-    // Create a transporter object using Gmail service
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS, // App password goes here
-      },
+    const info = await transporter.sendMail({
+      from: `"CMS Admin" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html: htmlContent,
     });
 
-    // Verify SMTP (optional but recommended)
-    await transporter.verify();
-
-    // Send the email
-    await transporter.sendMail({
-      from: `"CMS Admin" <${process.env.EMAIL_USER}>`, 
-      to, 
-      subject, 
-      html: htmlContent, 
-      text: "Please view this email in HTML-supported client", 
-    });
+    console.log("Email sent:", info.response);
   } catch (error) {
-    console.error("sendEmail error:", error);
+    console.error("Email sending failed:", error);
     throw error;
   }
 };
