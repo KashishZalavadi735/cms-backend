@@ -123,7 +123,7 @@ export const createAdminService = async (data: CreateAdminInput) => {
     setPasswordLink,
   );
 
-  // Send email — log error but DO NOT throw, admin is already created
+  // Send email
   let emailSent = true;
   try {
     await sendEmail(email, "Set Your Password - CMS", htmlContent);

@@ -6,29 +6,28 @@ export const sendEmail = async (
   htmlContent: string,
 ): Promise<void> => {
   try {
+    // Create a transporter object using Gmail service
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",      // ← explicit host instead of service: "gmail"
-      port: 587,                    // ← port 587 with STARTTLS
-      secure: false,                // ← false for port 587
+      service: "gmail",
       auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        pass: process.env.EMAIL_PASS, // App password goes here
       },
     });
 
-    await transporter.sendMail({
-      from: `"CMS Admin" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      html: htmlContent,
-      text: "Please view this email in HTML-supported client",
-    });
+    // Verify SMTP (optional but recommended)
+    await transporter.verify();
 
-    console.log(`Email sent to ${to}`);
-  } catch (error: any) {
-    console.error("sendEmail error:", error.message);
-    console.error("   Code:", error.code);
-    console.error("   Response:", error.response);
+    // Send the email
+    await transporter.sendMail({
+      from: `"CMS Admin" <${process.env.EMAIL_USER}>`, 
+      to, 
+      subject, 
+      html: htmlContent, 
+      text: "Please view this email in HTML-supported client", 
+    });
+  } catch (error) {
+    console.error("sendEmail error:", error);
     throw error;
   }
 };
